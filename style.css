@@ -753,10 +753,23 @@ input:focus, select:focus {
 
 @media (max-width: 480px) {
     .app-container {
-        padding: 15px;
+        padding: 12px;
     }
     .hero-title {
-        font-size: 28px;
+        font-size: 26px;
+    }
+    .tabs {
+        padding: 2px;
+        gap: 0;
+    }
+    .tab {
+        font-size: 11px;
+        padding: 8px 2px;
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 }
 
