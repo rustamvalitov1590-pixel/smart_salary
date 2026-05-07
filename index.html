@@ -2,38 +2,15 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Smart Salary</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <link rel="icon" type="image/png" href="favicon.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Smart Salary - Yearly Planner</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 </head>
 <body>
-    <div id="preloader">
-        <div class="preloader-mesh"></div>
-        <div class="preloader-content">
-            <div class="preloader-logo">
-                <div class="logo-inner">
-                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 2C6.48 2 2 4.01 2 6.5C2 8.99 6.48 11 12 11C17.52 11 22 8.99 22 6.5C22 4.01 17.52 2 12 2Z" fill="white"/>
-                        <path d="M22 11.5C22 13.99 17.52 16 12 16C6.48 16 2 13.99 2 11.5V9.17C3.59 10.29 7.56 11 12 11C16.44 11 20.41 10.29 22 9.17V11.5Z" fill="white" fill-opacity="0.8"/>
-                        <path d="M22 16.5C22 18.99 17.52 21 12 21C6.48 21 2 18.99 2 16.5V14.17C3.59 15.29 7.56 16 12 16C16.44 11 20.41 15.29 22 14.17V16.5Z" fill="white" fill-opacity="0.6"/>
-                    </svg>
-                </div>
-            </div>
-            <div class="preloader-title" id="preloader-text">
-                <span>S</span><span>m</span><span>a</span><span>r</span><span>t</span>&nbsp;
-                <span>S</span><span>a</span><span>l</span><span>a</span><span>r</span><span>y</span>
-            </div>
-            <div class="preloader-subtitle" data-i18n="preloader_subtitle">Hyper-Precision Financial Engine</div>
-            <div class="preloader-bar">
-                <div class="preloader-progress" id="preloader-progress"></div>
-            </div>
-        </div>
-    </div>
-
-
     <div class="app-container" id="workspace">
         <header class="gsap-reveal">
             <div class="header-top">
@@ -43,381 +20,303 @@
                     <button class="lang-btn" id="lang-kk" onclick="changeLanguage('kk')">ҚАЗ</button>
                 </div>
             </div>
-            <p class="subtitle" data-i18n="app_subtitle">Ваша персональная финансовая стратегия</p>
+            <p class="header-subtitle" data-i18n="app_subtitle">Профессиональный расчет заработной платы 2026</p>
         </header>
 
-        <nav class="tabs gsap-reveal">
-            <button class="tab active" onclick="switchTab('calc', this)" data-i18n="tab_calc">Калькулятор</button>
-            <button class="tab" onclick="switchTab('details', this)" data-i18n="tab_details">Детализация</button>
-            <button class="tab" onclick="switchTab('expenses', this)" data-i18n="tab_expenses">Расходы</button>
-            <button class="tab" onclick="switchTab('graphs', this)" data-i18n="tab_graphs">Графики</button>
+        <!-- Navigation Tabs -->
+        <nav class="main-nav gsap-reveal">
+            <button class="nav-item active" onclick="switchTab('calc')" id="tab-calc">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                <span data-i18n="nav_calc">Калькулятор</span>
+            </button>
+            <button class="nav-item" onclick="switchTab('details')" id="tab-details">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                <span data-i18n="nav_details">Детализация</span>
+            </button>
+            <button class="nav-item" onclick="switchTab('expenses')" id="tab-expenses">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"></path><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"></path><path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z"></path></svg>
+                <span data-i18n="nav_expenses">Бюджет</span>
+            </button>
+            <button class="nav-item" onclick="switchTab('yearly')" id="tab-yearly">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect><path d="M9 14l2 2 4-4"></path></svg>
+                <span data-i18n="nav_yearly">Год 2026</span>
+            </button>
+            <button class="nav-item" onclick="switchTab('graphs')" id="tab-graphs">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20v-6M6 20V10M18 20V4"></path></svg>
+                <span data-i18n="nav_graphs">Редактор</span>
+            </button>
         </nav>
 
-        <div id="tab-calc">
-            <header class="welcome-section gsap-reveal">
-                <div class="welcome-content">
-                    <h2 data-i18n="welcome_title">Профессиональное планирование на 2026 год</h2>
-                    <p data-i18n="welcome_desc">Ваш персональный помощник для точного расчета заработной платы по производственному календарю 2026 года. Система автоматически учитывает налоги, праздничные, ночные часы и помогает анализировать ваш личный бюджет.</p>
-                </div>
-            </header>
-
-            <section class="card gsap-reveal">
-                <div class="card-title" data-i18n="card_shifts">Параметры вахты</div>
-                
-                <div class="field">
-                    <label data-i18n="label_schedule">Выберите график работы</label>
-                    <select id="schedule-select" onchange="onScheduleChange()">
-                        <option value="График №3-1 (дневной)">График №3-1 (дневной)</option>
-                        <option value="График №3">График №3 (день+ночь)</option>
-                        <option value="График №2">График №2 (день+ночь)</option>
-                        <option value="График №2-1 (дневной)">График №2-1 (дневной)</option>
-                        <option value="График №2-12">График №2-12</option>
-                        <option value="График №3-12">График №3-12</option>
-                        <option value="График №4-1 (дневной)">График №4-1 (дневной)</option>
-                        <option value="График №4-12">График №4-12</option>
-                        <option value="График №4">График №4</option>
-                        <option value="График №5-1 (дневной)">График №5-1 (дневной)</option>
-                        <option value="График №5">График №5</option>
-                        <option value="График №7">График №7</option>
-                    </select>
-                </div>
-
-                <div id="shift-selector-container" class="toggle-group gsap-reveal">
-                    <!-- Dynamic shift buttons injected here -->
-                </div>
-
-                <div class="grid-2">
-                    <div class="field">
-                        <label data-i18n="label_month">Месяц 2026</label>
-                        <select id="month" onchange="updateView()">
-                            <option value="0">Январь</option>
-                            <option value="1">Февраль</option>
-                            <option value="2">Март</option>
-                            <option value="3" selected>Апрель</option>
-                            <option value="4">Май</option>
-                            <option value="5">Июнь</option>
-                            <option value="6">Июль</option>
-                            <option value="7">Август</option>
-                            <option value="8">Сентябрь</option>
-                            <option value="9">Октябрь</option>
-                            <option value="10">Ноябрь</option>
-                            <option value="11">Декабрь</option>
+        <main class="content-area">
+            <!-- TAB: CALCULATOR -->
+            <section id="pane-calc" class="tab-pane active">
+                <div class="input-card gsap-reveal">
+                    <div class="card-title" data-i18n="card_shifts">Параметры вахты</div>
+                    
+                    <div class="field-group">
+                        <label data-i18n="label_graph">Выберите график работы</label>
+                        <select id="schedule-select" onchange="updateView()">
+                            <!-- Generated via JS -->
                         </select>
                     </div>
-                    <div class="field">
-                        <label data-i18n="label_salary">Оклад (₸)</label>
-                        <input type="number" id="base-salary" data-i18n-placeholder="placeholder_salary" placeholder="Введите оклад" oninput="calculate()">
+
+                    <div class="shift-buttons" id="shift-selector">
+                        <!-- Generated via JS -->
                     </div>
-                </div>
 
-                <div class="grid-2">
-                    <div class="field">
-                        <label data-i18n="label_alimony">Алименты (удержание)</label>
-                        <select id="alimony-percent" onchange="calculate()">
-                            <option value="0" data-i18n="alimony_none">Нет</option>
-                            <option value="25" data-i18n="alimony_1">25% (1 ребенок)</option>
-                            <option value="33.3" data-i18n="alimony_2">33.3% (2 детей)</option>
-                            <option value="50" data-i18n="alimony_3">50% (3+ детей)</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="additional-options gsap-reveal">
-                    <label class="checkbox-container">
-                        <input type="checkbox" id="joint-role" onchange="calculate()">
-                        <div class="checkbox-label">
-                            <span class="main-label" data-i18n="label_joint">Доплата за совмещение (30%)</span>
-                            <span class="sub-label" data-i18n="sub_joint">Начисляется от основного оклада</span>
-                        </div>
-                    </label>
-
-                    <label class="checkbox-container">
-                        <input type="checkbox" id="driving-allowance" onchange="toggleDrivingDetails()">
-                        <div class="checkbox-label">
-                            <span class="main-label" data-i18n="label_driving">Доплата за вождение</span>
-                            <span class="sub-label" data-i18n="sub_driving">Служебный транспорт / Спецтехника</span>
-                        </div>
-                    </label>
-
-                    <div id="driving-details" style="display: none; padding: 15px; background: rgba(0,0,0,0.02); border-radius: 12px; margin-top: 8px; border: 1px dashed var(--border-color);">
+                    <div class="input-row">
                         <div class="field">
-                            <label data-i18n="label_driver_rate">Ставка (%)</label>
-                            <input type="number" id="driver-rate" placeholder="0" oninput="calculate()">
+                            <label data-i18n="label_month">Месяц 2026</label>
+                            <select id="month" onchange="updateView()">
+                                <!-- Generated via JS -->
+                            </select>
                         </div>
-                        <div style="font-size: 10px; color: var(--text-muted); margin-top: 5px;" data-i18n="driver_hint">
-                            * Расчет по окладу водителя 4р: 652 076.88 ₸
-                        </div>
-                    </div>
-
-
-
-
-                    <label class="checkbox-container">
-                        <input type="checkbox" id="discrete-night" onchange="toggleNightDetails()">
-                        <div class="checkbox-label">
-                            <span class="main-label" data-i18n="label_night_discrete">Ночные (дискретный режим)</span>
-                            <span class="sub-label" data-i18n="sub_night_discrete">Специальный расчет ночных смен</span>
-                        </div>
-                    </label>
-
-                    <label class="checkbox-container">
-                        <input type="checkbox" id="fitness-deduction" onchange="calculate()">
-                        <div class="checkbox-label">
-                            <span class="main-label" data-i18n="label_fitness">Фитнес абонемент</span>
-                            <span class="sub-label" data-i18n="sub_fitness">Фиксированное удержание (22 263 ₸)</span>
-                        </div>
-                    </label>
-
-                    <div id="night-details" style="display: none; padding: 15px; background: rgba(0,0,0,0.02); border-radius: 12px; margin-top: 8px; border: 1px dashed var(--border-color);">
-                        <div class="grid-2">
-                            <div class="field">
-                                <label data-i18n="label_night_hours">Ночные часы</label>
-                                <input type="number" id="night-hours" placeholder="0" oninput="calculate()">
-                            </div>
-                            <div class="field">
-                                <label data-i18n="label_discrete_nights_label">Дискр. выезды</label>
-                                <input type="number" id="discrete-nights" placeholder="0" oninput="calculate()">
-                            </div>
-                        </div>
-                        <div style="font-size: 10px; color: var(--text-muted); margin-top: 5px;" data-i18n="night_hint">
-                            * Доплата: (R/2) × Часы + Выезды × 650
+                        <div class="field">
+                            <label data-i18n="label_salary">Оклад (₸)</label>
+                            <input type="number" id="base-salary" value="779268" oninput="calculate()">
                         </div>
                     </div>
 
-                </div>
-            </section>
-
-            <section class="card gsap-reveal" id="working-hours-card">
-                <div class="card-title" data-i18n="card_tabel">Данные табеля</div>
-                <div class="grid-2">
-                    <div class="field">
-                        <label data-i18n="label_norm">Норма (ч)</label>
-                        <input type="number" id="input-norm" oninput="calculate()">
-                    </div>
-                    <div class="field">
-                        <label data-i18n="label_total">Всего по графику (ч)</label>
-                        <input type="number" id="input-total" oninput="calculate()">
-                    </div>
-                </div>
-
-                <div class="grid-2 gsap-reveal">
-                    <div class="field">
-                        <label data-i18n="label_holiday">Праздничные (ч)</label>
-                        <input type="number" id="input-holiday" oninput="calculate()">
-                    </div>
-                    <div class="field">
-                        <label data-i18n="label_road">Время в пути (ч)</label>
-                        <input type="number" id="input-road" oninput="calculate()">
-                    </div>
-                </div>
-
-                <div class="grid-2 gsap-reveal">
-                    <div class="field">
-                        <label data-i18n="label_training">Обучение (ч)</label>
-                        <input type="number" id="input-training" value="0" oninput="calculate()">
-                    </div>
-                </div>
-
-                <div class="grid-2 gsap-reveal" id="night-hours-row" style="display:none">
-                    <div class="field">
-                        <label data-i18n="label_night">Ночные (ч)</label>
-                        <input type="number" id="input-night" value="0" oninput="calculate()">
-                    </div>
-                </div>
-            </section>
-
-            <section class="summary gsap-reveal">
-                <div class="summary-label" data-i18n="summary_net">Зарплата (Net)</div>
-                <div class="summary-value" id="res-net">0 ₸</div>
-                
-                <div id="festive-summary" style="display: none; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 15px; padding-top: 15px;">
-                    <div class="sub-item">
-                        <span class="summary-label" style="color: #60a5fa" data-i18n="summary_festive">К празднику (Премия)</span>
-                        <span class="sub-val" style="font-size: 1.2rem; font-weight: 600" id="res-festive-net">0 ₸</span>
-                    </div>
-                </div>
-
-                <div class="summary-sub" style="margin-top: 15px;">
-                    <div class="sub-item">
-                        <span class="summary-label" data-i18n="summary_gross">Всего начислено</span>
-                        <span class="sub-val" id="res-gross">0 ₸</span>
-                    </div>
-                    <div class="sub-item" style="text-align: right">
-                        <span class="summary-label" data-i18n="summary_tax">Налоги</span>
-                        <span class="sub-val" style="color: #f87171" id="res-tax">0 ₸</span>
-                    </div>
-                </div>
-            </section>
-        </div>
-
-        <div id="tab-details" style="display: none;">
-            <section class="card">
-                <div class="card-title" data-i18n="card_gross">Начисления</div>
-                <div id="detailed-gross"></div>
-            </section>
-
-            <section class="card">
-                <div class="card-title" data-i18n="card_taxes_alimony">Удержания и Налоги</div>
-                <div id="detailed-taxes"></div>
-            </section>
-        </div>
-
-        <div id="tab-expenses" style="display: none;">
-            <!-- Панель анализа экономии -->
-            <div id="savings-panel" class="savings-card gsap-reveal" style="display: none;"></div>
-
-            <section class="budget-visualization gsap-reveal">
-                <div class="donut-container">
-                    <svg class="donut-svg" width="200" height="200" viewBox="0 0 200 200">
-                        <circle class="donut-ring" cx="100" cy="100" r="85"></circle>
-                        <circle id="donut-segment-income" class="donut-income" cx="100" cy="100" r="85"></circle>
-                        <circle id="donut-segment-expenses" class="donut-expenses" cx="100" cy="100" r="85"></circle>
-                    </svg>
-                    <div class="donut-text">
-                        <span id="donut-pct" class="donut-percent">0%</span>
-                        <span class="donut-label" data-i18n="free_pct_label">Свободно</span>
-                    </div>
-                </div>
-                <div class="legend">
-                    <div class="legend-item">
-                        <div class="dot dot-income"></div>
-                        <span>Доход</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="dot dot-expenses"></div>
-                        <span>Расходы</span>
-                    </div>
-                </div>
-            </section>
-
-            <section class="add-expense-form gsap-reveal">
-                <div class="card-title" data-i18n="tab_expenses_title">Добавить расход / кредит</div>
-                <div class="field">
-                    <label data-i18n="label_exp_name">Название</label>
-                    <input type="text" id="exp-name" data-i18n-placeholder="placeholder_exp" placeholder="Напр. Кредит на авто">
-                </div>
-                
-                <div class="grid-2" style="margin-top:15px">
-                    <div class="field">
-                        <label data-i18n="label_exp_amount">Сумма платежа (₸)</label>
-                        <input type="number" id="exp-amount" placeholder="0">
-                    </div>
-                    <div class="field">
-                        <label data-i18n="label_exp_type">Тип расхода</label>
-                        <select id="exp-type" onchange="toggleTermField()">
-                            <option value="regular" data-i18n="exp_type_reg">Регулярный (Всегда)</option>
-                            <option value="credit" data-i18n="exp_type_credit">Кредит (Срок)</option>
-                            <option value="once" data-i18n="exp_type_once">Разовый (В этом месяце)</option>
+                    <div class="field-group">
+                        <label data-i18n="label_alimony">Алименты (удержание)</label>
+                        <select id="alimony" onchange="calculate()">
+                            <option value="0" data-i18n="opt_none">Нет</option>
+                            <option value="0.25">25% (на 1 ребенка)</option>
+                            <option value="0.33">33% (на 2 детей)</option>
+                            <option value="0.50">50% (на 3+ детей)</option>
                         </select>
                     </div>
+
+                    <div class="additional-options gsap-reveal">
+                        <label class="checkbox-container">
+                            <input type="checkbox" id="joint-role" onchange="calculate()">
+                            <div class="checkbox-label">
+                                <span class="main-label" data-i18n="label_joint">Доплата за совмещение (30%)</span>
+                                <span class="sub-label" data-i18n="sub_joint">Начисляется от основного оклада</span>
+                            </div>
+                        </label>
+
+                        <label class="checkbox-container">
+                            <input type="checkbox" id="driving-allowance" onchange="toggleDrivingDetails()">
+                            <div class="checkbox-label">
+                                <span class="main-label" data-i18n="label_driving">Доплата за вождение</span>
+                                <span class="sub-label" data-i18n="sub_driving">Служебный транспорт / Спецтехника</span>
+                            </div>
+                        </label>
+
+                        <!-- MEDICAL EXAM (POINT 290) -->
+                        <label class="checkbox-container">
+                            <input type="checkbox" id="med-exam-allowance" onchange="calculate()">
+                            <div class="checkbox-label">
+                                <span class="main-label" data-i18n="label_med_exam">Медосмотр (Пункт 290)</span>
+                                <span class="sub-label" data-i18n="sub_med_exam">Начисляется один раз в год в выбранном месяце</span>
+                            </div>
+                        </label>
+
+                        <label class="checkbox-container">
+                            <input type="checkbox" id="discrete-night" onchange="toggleNightDetails()">
+                            <div class="checkbox-label">
+                                <span class="main-label" data-i18n="label_night">Ночные (дискретный режим)</span>
+                                <span class="sub-label" data-i18n="sub_night">Специальный расчет ночных смен</span>
+                            </div>
+                        </label>
+
+                        <label class="checkbox-container">
+                            <input type="checkbox" id="fitness-deduction" onchange="calculate()">
+                            <div class="checkbox-label">
+                                <span class="main-label" data-i18n="label_fitness">Фитнес абонемент</span>
+                                <span class="sub-label" data-i18n="sub_fitness">Фиксированное удержание (22 263 ₸)</span>
+                            </div>
+                        </label>
+                    </div>
+
+                    <!-- Hidden details that appear on toggle -->
+                    <div id="driving-details" class="hidden-details">
+                        <div class="field-group" style="margin-top: 15px;">
+                            <label>Процент доплаты за вождение (%)</label>
+                            <input type="number" id="driver-rate" value="10" oninput="calculate()">
+                        </div>
+                    </div>
+
+                    <div id="night-details" class="hidden-details">
+                        <div class="field-group" style="margin-top: 15px;">
+                            <label>Отработано часов ночью (дискретно)</label>
+                            <input type="number" id="night-hours-custom" value="0" oninput="calculate()">
+                        </div>
+                    </div>
                 </div>
 
-                <div id="term-field" class="field" style="display: none; margin-top: 15px;">
-                    <label data-i18n="label_exp_term">Срок (мес.)</label>
-                    <input type="number" id="exp-term" placeholder="Напр. 12">
+                <div class="result-card gsap-reveal">
+                    <div class="res-item main">
+                        <span data-i18n="res_net">К выдаче (Net)</span>
+                        <div class="res-value highlight" id="res-net">0,00 ₸</div>
+                    </div>
+                    <div class="res-grid">
+                        <div class="res-item">
+                            <span data-i18n="res_gross">Начислено (Gross)</span>
+                            <span class="res-value" id="res-gross">0,00 ₸</span>
+                        </div>
+                        <div class="res-item">
+                            <span data-i18n="res_taxes">Налоги и отчисления</span>
+                            <span class="res-value" id="res-taxes">0,00 ₸</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Expense Summary Mini -->
+                    <div class="expense-summary-mini" id="expense-mini" style="display: none;">
+                        <div class="res-item">
+                            <span>План. расходы</span>
+                            <span class="res-value" id="res-expenses">0,00 ₸</span>
+                        </div>
+                        <div class="res-item">
+                            <span>Свободный остаток</span>
+                            <span class="res-value" id="res-balance" style="color: var(--primary);">0,00 ₸</span>
+                        </div>
+                    </div>
                 </div>
-
-                <div class="field" style="margin-top: 15px;">
-                    <label data-i18n="label_exp_priority">Важность расхода</label>
-                    <select id="exp-priority">
-                        <option value="mandatory" data-i18n="exp_pri_high">Обязательный (Кредиты, аренда, налоги)</option>
-                        <option value="optional" data-i18n="exp_pri_low">Необязательный (Подписки, развлечения, кафе)</option>
-                    </select>
-                </div>
-                <button class="btn-add" onclick="addExpense()" data-i18n="btn_add_exp">+ Добавить в список</button>
             </section>
 
-            <section class="card">
-                <div class="card-title" data-i18n="card_your_expenses">Ваши обязательства</div>
-                <div id="expenses-list">
-                    <!-- Расходы будут здесь -->
+            <!-- TAB: DETAILS -->
+            <section id="pane-details" class="tab-pane">
+                <div class="details-card gsap-reveal" id="details-container">
+                    <!-- Tables generated by JS -->
                 </div>
             </section>
 
-            <section class="budget-summary">
-                <div class="summary-label" data-i18n="label_free_balance">Свободный остаток (ЗП - Расходы)</div>
-                <div class="budget-free" id="res-free-balance">0 ₸</div>
-                <div class="sub-item" style="opacity: 0.7; margin-top: 10px;">
-                    <span data-i18n="label_total_expenses">Общая сумма расходов:</span>
-                    <span id="res-total-expenses">0 ₸</span>
+            <!-- TAB: EXPENSES & CREDITS -->
+            <section id="pane-expenses" class="tab-pane">
+                <div class="expense-form-card gsap-reveal">
+                    <div class="card-title">Добавить расход или кредит</div>
+                    <div class="field-group">
+                        <label>Наименование</label>
+                        <input type="text" id="exp-name" placeholder="Напр: Ипотека, Продукты...">
+                    </div>
+                    <div class="input-row">
+                        <div class="field">
+                            <label>Сумма (₸)</label>
+                            <input type="number" id="exp-amount">
+                        </div>
+                        <div class="field">
+                            <label>Тип</label>
+                            <select id="exp-type" onchange="toggleTermField()">
+                                <option value="regular">Ежемесячный</option>
+                                <option value="credit">Кредит / Займ</option>
+                                <option value="once">Разовый (в этом мес)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div id="term-field" style="display:none">
+                        <div class="input-row">
+                            <div class="field">
+                                <label>Срок (мес)</label>
+                                <input type="number" id="exp-term" placeholder="Напр: 12">
+                            </div>
+                            <div class="field">
+                                <label>Остаток долга (ОД)</label>
+                                <input type="number" id="exp-principal" placeholder="Общая сумма долга">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="field-group">
+                        <label>Приоритет</label>
+                        <select id="exp-priority">
+                            <option value="mandatory">Обязательный (нельзя сократить)</option>
+                            <option value="optional">Дополнительный (можно сэкономить)</option>
+                        </select>
+                    </div>
+                    
+                    <button class="btn-primary" onclick="addExpense()" style="width:100%">Добавить в план</button>
                 </div>
-                <div class="sub-item" style="color: #fbbf24; margin-top: 5px; font-weight: 600;">
-                    <span data-i18n="label_can_save">Можно сэкономить:</span>
-                    <span id="res-reducible-total">0 ₸</span>
+
+                <div id="savings-panel" class="savings-card gsap-reveal" style="display:none">
+                    <!-- Analysis generated by JS -->
+                </div>
+
+                <div class="expenses-list-container" id="expenses-list">
+                    <!-- List generated by JS -->
                 </div>
             </section>
-        </div>
 
-        <div id="tab-graphs" style="display: none;">
-            <section class="card gsap-reveal">
-                <div class="card-title" data-i18n="card_editor">Редактор графика (2026)</div>
-                
-                <div class="grid-2" style="margin-bottom: 20px;">
-                    <div class="field">
-                        <label>Выберите график</label>
+            <!-- TAB: YEARLY REPORT -->
+            <section id="pane-yearly" class="tab-pane">
+                <div class="yearly-card gsap-reveal">
+                    <div class="card-title">Сводный отчет за 2026 год</div>
+                    <p style="opacity:0.7; font-size:0.9rem; margin-bottom:20px">Расчет основан на текущем окладе и всех ваших правках в графиках.</p>
+                    
+                    <div class="yearly-stats">
+                        <div class="stat-box">
+                            <label>Доход (Net) за год</label>
+                            <div class="stat-value" id="year-total-net">0 ₸</div>
+                        </div>
+                        <div class="stat-box">
+                            <label>Расходы за год</label>
+                            <div class="stat-value" id="year-total-exp" style="color:var(--danger)">0 ₸</div>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="yearly-table">
+                            <thead>
+                                <tr>
+                                    <th>Месяц</th>
+                                    <th>Зарплата (Net)</th>
+                                    <th>Расходы</th>
+                                    <th>Остаток</th>
+                                </tr>
+                            </thead>
+                            <tbody id="yearly-report-body">
+                                <!-- Generated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB: SCHEDULE EDITOR -->
+            <section id="pane-graphs" class="tab-pane">
+                <div class="editor-header-card gsap-reveal">
+                    <div class="card-title">Редактор производственного календаря</div>
+                    <div class="field-group">
+                        <label>Выберите график для редактирования</label>
                         <select id="editor-schedule-select" onchange="syncFromEditor('graph')">
-                            <option value="График №3-1 (дневной)">График №3-1 (дневной)</option>
-                            <option value="График №3">График №3 (день+ночь)</option>
-                            <option value="График №2">График №2 (день+ночь)</option>
-                            <option value="График №2-1 (дневной)">График №2-1 (дневной)</option>
-                            <option value="График №2-12">График №2-12</option>
-                            <option value="График №3-12">График №3-12</option>
-                            <option value="График №4-1 (дневной)">График №4-1 (дневной)</option>
-                            <option value="График №4-12">График №4-12</option>
-                            <option value="График №4">График №4</option>
-                            <option value="График №5-1 (дневной)">График №5-1 (дневной)</option>
-                            <option value="График №5">График №5</option>
-                            <option value="График №7">График №7</option>
+                            <!-- Syncs with main select -->
                         </select>
                     </div>
-                    <div class="field">
-                        <label>Месяц</label>
-                        <select id="editor-month" onchange="syncFromEditor('month')">
-                            <option value="0">Январь</option>
-                            <option value="1">Февраль</option>
-                            <option value="2">Март</option>
-                            <option value="3">Апрель</option>
-                            <option value="4">Май</option>
-                            <option value="5">Июнь</option>
-                            <option value="6">Июль</option>
-                            <option value="7">Август</option>
-                            <option value="8">Сентябрь</option>
-                            <option value="9">Октябрь</option>
-                            <option value="10">Ноябрь</option>
-                            <option value="11">Декабрь</option>
+                    <div class="input-row">
+                        <div class="field">
+                            <label>Месяц</label>
+                            <select id="editor-month" onchange="syncFromEditor('month')">
+                                <!-- Syncs with main month -->
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Норма часов</label>
+                            <input type="number" id="ed-norm" oninput="saveScheduleChanges()">
+                        </div>
+                    </div>
+                    <div class="field-group">
+                        <label>Выберите смену (Буква)</label>
+                        <select id="editor-shift-select" onchange="renderScheduleEditor()">
+                            <!-- Generated via JS based on schedule -->
                         </select>
                     </div>
-                </div>
-
-                <div class="field" style="margin-bottom: 20px;">
-                    <label data-i18n="label_editor_shift">Выберите смену для редактирования</label>
-                    <select id="editor-shift-select" onchange="renderScheduleEditor()">
-                        <!-- Dynamic options (A-K) -->
-                    </select>
-                </div>
-
-                <div class="editor-norm field" style="border-top: 1px solid var(--border-color); padding-top: 15px;">
-                    <label data-i18n="label_editor_norm">Норма часов в месяц</label>
-                    <input type="number" id="ed-norm" placeholder="0">
                 </div>
 
                 <div id="editor-shifts-grid">
-                    <!-- Будет заполнено JS: Смены A, B, C, D -->
+                    <!-- Editor fields generated here -->
                 </div>
 
-                <button class="btn-add" onclick="saveScheduleChanges()" style="background: var(--accent-emerald); margin-top: 20px;" data-i18n="btn_save">
-                    💾 Сохранить и применить
-                </button>
-                <div style="font-size: 11px; color: var(--text-muted); text-align: center; margin-top: 10px;" data-i18n="storage_hint">
-                    * Данные сохраняются в памяти этого браузера
+                <div class="editor-actions gsap-reveal" style="margin-top:20px">
+                    <button class="btn-primary" onclick="saveScheduleChanges()" style="width:100%; display:flex; align-items:center; justify-content:center; gap:10px">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                        Сохранить изменения в базу
+                    </button>
+                    <p style="text-align:center; font-size:0.8rem; opacity:0.5; margin-top:10px">Данные сохраняются локально в вашем браузере</p>
                 </div>
             </section>
-        </div>
-
-
-        <footer>
-            <div class="config-meta gsap-reveal">МРП 2026: 4,325 ₸ • Вычет (Код 701): 129,750 ₸ • Вахта (Код 062): 650 ₸/день</div>
-        </footer>
+        </main>
     </div>
 
     <script src="schedules.js"></script>
