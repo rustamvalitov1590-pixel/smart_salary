@@ -57,9 +57,9 @@
         <div id="tab-dashboard" style="display: block;">
             <section class="dashboard-grid gsap-reveal" style="margin-top: 20px;">
                     <div class="dash-card main">
-                        <div class="dash-label">Прогноз дохода (2026)</div>
+                        <div class="dash-label" data-i18n="dash_projection">Прогноз дохода (2026)</div>
                         <div class="dash-value" id="dash-year-net">0 ₸</div>
-                        <div class="dash-sub">Чистая прибыль за 12 месяцев</div>
+                        <div class="dash-sub" data-i18n="dash_net_12">Чистая прибыль за 12 месяцев</div>
                     </div>
                     
                     <div class="dash-card bonus">
@@ -71,24 +71,26 @@
                 
                 <div class="grid-2">
                     <div class="dash-card">
-                        <div class="dash-label">Расходы (Год)</div>
+                        <div class="dash-label" data-i18n="label_expenses_annual">Расходы (Год)</div>
                         <div class="dash-value small" id="dash-year-exp">0 ₸</div>
-                        <div class="dash-trend down">Обязательства</div>
+                        <div class="dash-trend down" data-i18n="dash_liabilities">Обязательства</div>
                     </div>
                     <div class="dash-card">
-                        <div class="dash-label">Свободно</div>
+                        <div class="dash-label" data-i18n="label_free_annual">Свободно</div>
                         <div class="dash-value small" id="dash-year-free">0 ₸</div>
-                        <div class="dash-trend up">Потенциал</div>
+                        <div class="dash-trend up" data-i18n="dash_potential">Потенциал</div>
                     </div>
                 </div>
 
                 <div class="dash-card chart-mini">
-                    <div class="dash-label">Динамика зарплаты</div>
+                    <div class="dash-label" data-i18n="dash_chart_title">Динамика зарплаты</div>
                     <div class="mini-chart-container" id="yearly-mini-chart">
                         <!-- Bars will be injected here -->
                     </div>
                     <div class="mini-chart-months">
-                        <span>Янв</span><span>Июн</span><span>Дек</span>
+                        <span data-i18n="month_short_jan">Янв</span>
+                        <span data-i18n="month_short_jun">Июн</span>
+                        <span data-i18n="month_short_dec">Дек</span>
                     </div>
                 </div>
             </section>
@@ -134,14 +136,16 @@
                         <label data-i18n="label_salary">Оклад 2026 (Gross)</label>
                         <input type="number" id="base-salary" placeholder="0" oninput="calculate()">
                     </div>
-                    <div class="field" style="display: flex; gap: 10px;">
-                        <div style="flex: 1;">
-                            <label>Начало отпуска</label>
-                            <input type="date" id="vacation-start" onchange="calculate()" value="2025-08-24">
-                        </div>
-                        <div style="flex: 1;">
-                            <label>Конец отпуска</label>
-                            <input type="date" id="vacation-end" onchange="calculate()" value="2025-09-22">
+                    <div class="field">
+                        <div class="vacation-dates-grid">
+                            <div class="vacation-field">
+                                <label data-i18n="label_vac_start">Начало отпуска</label>
+                                <input type="date" id="vacation-start" onchange="calculate()" value="2025-08-24">
+                            </div>
+                            <div class="vacation-field">
+                                <label data-i18n="label_vac_end">Конец отпуска</label>
+                                <input type="date" id="vacation-end" onchange="calculate()" value="2025-09-22">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -237,8 +241,8 @@
                     <label class="checkbox-container">
                         <input type="checkbox" id="union-fee-toggle" checked onchange="handleUnionToggle()">
                         <div class="checkbox-label">
-                            <span class="main-label">Профсоюзный взнос (1%)</span>
-                            <span class="sub-label">Удержание 1% от основных начислений</span>
+                            <span class="main-label" data-i18n="label_union">Профсоюзный взнос (1%)</span>
+                            <span class="sub-label" data-i18n="sub_union">Удержание 1% от основных начислений</span>
                         </div>
                     </label>
 
@@ -256,7 +260,7 @@
                 <div class="card-title" data-i18n="card_tabel">Данные табеля</div>
                 <div class="grid-2">
                     <div class="field">
-                        <label>Прочие начисления (Gross)</label>
+                        <label data-i18n="label_other_gross">Прочие начисления (Gross)</label>
                         <input type="number" id="input-other-gross" placeholder="0" oninput="calculate()">
                     </div>
                     <div class="field">
@@ -351,11 +355,11 @@
                 <div class="legend">
                     <div class="legend-item">
                         <div class="dot dot-income"></div>
-                        <span>Доход</span>
+                        <span data-i18n="legend_income">Доход</span>
                     </div>
                     <div class="legend-item">
                         <div class="dot dot-expenses"></div>
-                        <span>Расходы</span>
+                        <span data-i18n="legend_expenses">Расходы</span>
                     </div>
                 </div>
             </section>
@@ -369,16 +373,16 @@
                         <input type="text" id="exp-name" data-i18n-placeholder="placeholder_exp" placeholder="Напр. Кредит на авто">
                     </div>
                     <div class="field">
-                        <label>Категория</label>
+                        <label data-i18n="label_category">Категория</label>
                         <select id="exp-category">
-                            <option value="credits">Кредиты</option>
-                            <option value="utilities">Комуслуги</option>
-                            <option value="education">Обучение детей</option>
-                            <option value="shopping">Шопинг</option>
-                            <option value="entertainment">Развлечения</option>
-                            <option value="events">Мероприятия</option>
-                            <option value="food">Продукты питания</option>
-                            <option value="other" selected>Прочее</option>
+                            <option value="credits" data-i18n="cat_credits">Кредиты</option>
+                            <option value="utilities" data-i18n="cat_utilities">Комуслуги</option>
+                            <option value="education" data-i18n="cat_education">Обучение детей</option>
+                            <option value="shopping" data-i18n="cat_shopping">Шопинг</option>
+                            <option value="entertainment" data-i18n="cat_entertainment">Развлечения</option>
+                            <option value="events" data-i18n="cat_events">Мероприятия</option>
+                            <option value="food" data-i18n="cat_food">Продукты питания</option>
+                            <option value="other" selected data-i18n="cat_other">Прочее</option>
                         </select>
                     </div>
                 </div>
