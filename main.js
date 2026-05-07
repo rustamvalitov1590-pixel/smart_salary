@@ -8,7 +8,8 @@ const CONFIG = {
     MED_ADD: 6616,          // Код 293
     MED_DEDUCT: 5240,       // Код 442
     BONUS_PERCENT: 0.25,
-    MEDICAL_EXAM_RATE: 0.05805275580518526, // Код 290: Сверхточный расчет 5.805...%
+    UNION_FEE: 0.01,         // Профсоюзный взнос (Код 440)
+    MEDICAL_EXAM_RATE: 0.05805275580518526, // Код 290
     FITNESS_DEDUCTION: 22263,  // Удержание за фитнес
     DRIVER_SALARY_4: 652076.8831168831
 };
@@ -20,10 +21,27 @@ const HOLIDAY_BONUSES = {
     11: 40  // Декабрь
 };
 
+const NORMS_2025 = [160, 160, 144, 176, 152, 168, 176, 168, 176, 184, 160, 168];
+const HOLIDAYS_2025 = [
+    [1, 2, 7], // Янв
+    [], // Фев
+    [8, 21, 22, 23, 24, 25], // Мар (Наурыз + перенос)
+    [], // Апр
+    [1, 7, 8, 9], // Май
+    [16], // Июн (Курбан айт)
+    [6, 7, 8], // Июл
+    [30], // Авг
+    [], // Сен
+    [25], // Окт
+    [], // Ноя
+    [16, 17] // Дек
+];
+
 const TRANSLATIONS = {
     ru: {
         app_title: "Smart Salary",
         app_subtitle: "Ваша персональная финансовая стратегия",
+        tab_dashboard: "Обзор",
         tab_calc: "Калькулятор",
         tab_details: "Детализация",
         tab_expenses: "Расходы",
@@ -125,6 +143,7 @@ const TRANSLATIONS = {
     kk: {
         app_title: "Smart Salary",
         app_subtitle: "Сіздің жеке қаржылық стратегияңыз",
+        tab_dashboard: "Шолу",
         tab_calc: "Есептегіш",
         tab_details: "Толығырақ",
         tab_expenses: "Шығындар",
@@ -227,14 +246,30 @@ const TRANSLATIONS = {
 
 let currentState = {
     lang: 'ru', // Текущий язык
-    selectedGraph: "График №3-1 (дневной)",
-    selectedShift: 'A',
-    selectedMonth: 2, // Март
-    salary: CONFIG.BASE_SALARY,
-    hasJointRole: false,
-    expenses: [],
-    userSchedules: {} // Хранилище правок пользователя
+    selectedGraph: localStorage.getItem('selectedGraph') || 'graph1',
+    selectedShift: localStorage.getItem('selectedShift') || 'A',
+    salary: parseFloat(localStorage.getItem('salary')) || 700000,
+    unionFeeByMonth: JSON.parse(localStorage.getItem('unionFeeByMonth')) || {}, // monthIndex -> boolean
+    medExamByMonth: JSON.parse(localStorage.getItem('medExamByMonth')) || {},   // monthIndex -> boolean
+    expenses: JSON.parse(localStorage.getItem('shiftcalc_expenses')) || [],
+    userSchedules: {}, // Хранилище правок пользователя
+    selectedMonth: new Date().getMonth(),
+    annualBonus2025: 0,
+    joint: localStorage.getItem('joint') === 'true',
+    alimony: parseFloat(localStorage.getItem('alimony')) || 0,
+    fitness: localStorage.getItem('fitness') === 'true'
 };
+
+function savePersistentState() {
+    localStorage.setItem('selectedGraph', currentState.selectedGraph);
+    localStorage.setItem('selectedShift', currentState.selectedShift);
+    localStorage.setItem('salary', currentState.salary);
+    localStorage.setItem('unionFeeByMonth', JSON.stringify(currentState.unionFeeByMonth));
+    localStorage.setItem('medExamByMonth', JSON.stringify(currentState.medExamByMonth));
+    localStorage.setItem('joint', currentState.joint);
+    localStorage.setItem('alimony', currentState.alimony);
+    localStorage.setItem('fitness', currentState.fitness);
+}
 
 function t(key) {
     return TRANSLATIONS[currentState.lang][key] || key;
@@ -298,12 +333,18 @@ document.addEventListener('DOMContentLoaded', () => {
     updateUIStrings();
     renderMonthDropdown();
     updateView();
+    calculateYearlyProjection(); // Первичный расчет года
+    updateDashboardBonus(); // Расчет годовой премии 2025
 });
 
 function initApp() {
     document.getElementById('month').value = currentState.selectedMonth;
     document.getElementById('base-salary').value = currentState.salary;
     document.getElementById('schedule-select').value = currentState.selectedGraph;
+    
+    if (document.getElementById('joint-role')) document.getElementById('joint-role').checked = currentState.joint;
+    if (document.getElementById('alimony-percent')) document.getElementById('alimony-percent').value = currentState.alimony;
+    if (document.getElementById('fitness-deduction')) document.getElementById('fitness-deduction').checked = currentState.fitness;
     
     // Initialize dynamic shifts
     renderShiftSelector();
@@ -404,13 +445,14 @@ function startApp() {
             });
 
             // Reveal workspace contents
-            gsap.from(".gsap-reveal", {
-                y: 20,
-                opacity: 0,
-                duration: 0.6,
-                stagger: 0.05,
-                ease: "power2.out"
-            });
+            // Восстанавливаем оклад и график
+            document.getElementById('input-salary').value = currentState.salary2026;
+            document.getElementById('schedule-select').value = currentState.selectedGraph;
+            document.getElementById('shift-select').value = currentState.selectedShift;
+            document.getElementById('month').value = currentState.selectedMonth;
+
+            updateView();
+            gsap.from(".gsap-reveal", { opacity: 0, y: 20, duration: 0.8, stagger: 0.1 });
         }
     });
 }
@@ -480,28 +522,19 @@ function updateView() {
     document.getElementById('input-holiday').value = shiftData.h || 0;
     document.getElementById('input-road').value = shiftData.r || 8;
     
-    // Сброс разовых начислений при смене месяца/смены
-    const trainingInput = document.getElementById('input-training');
-    if (trainingInput) trainingInput.value = 0;
-    
-    const medExamCB = document.getElementById('med-exam-allowance');
-    if (medExamCB) medExamCB.checked = false;
-    
-    // Auto-populate night hours
-    const nightHoursInput = document.getElementById('input-night');
-    if (nightHoursInput) {
-        nightHoursInput.value = shiftData.n || 0;
-        
-        // Ensure Night logic is triggered if n > 0
-        const nightCB = document.getElementById('discrete-night');
-        const nightRow = document.getElementById('night-hours-row');
-        if (shiftData.n > 0) {
-            if (nightCB) nightCB.checked = true;
-            if (nightRow) nightRow.style.display = 'grid';
-        } else {
-            if (nightCB) nightCB.checked = false;
-            if (nightRow) nightRow.style.display = 'none';
+    // Восстановление галочек профсоюза и медосмотра
+    const unionCB = document.getElementById('union-fee-toggle');
+    if (unionCB) {
+        let lastVal = true;
+        for (let i = 0; i <= monthIdx; i++) {
+            if (currentState.unionFeeByMonth[i] !== undefined) lastVal = currentState.unionFeeByMonth[i];
         }
+        unionCB.checked = lastVal;
+    }
+
+    const medCB = document.getElementById('med-exam-allowance');
+    if (medCB) {
+        medCB.checked = !!currentState.medExamByMonth[monthIdx];
     }
     
     calculate();
@@ -548,8 +581,35 @@ function toggleNightDetails() {
 }
 
 
+function handleUnionToggle() {
+    const isChecked = document.getElementById('union-fee-toggle').checked;
+    const currentMonth = currentState.selectedMonth;
+    
+    // Переносим на этот и все последующие месяца
+    for (let i = currentMonth; i < 12; i++) {
+        currentState.unionFeeByMonth[i] = isChecked;
+    }
+    savePersistentState();
+    calculate();
+}
+
+function handleMedExamToggle() {
+    const isChecked = document.getElementById('med-exam-allowance').checked;
+    currentState.medExamByMonth[currentState.selectedMonth] = isChecked;
+    savePersistentState();
+    calculate();
+}
+
 function calculate() {
+    // 1. Собираем данные из UI
     const salary = parseFloat(document.getElementById('base-salary').value) || 0;
+    currentState.salary = salary;
+    currentState.selectedGraph = document.getElementById('schedule-select').value;
+    currentState.joint = document.getElementById('joint-role')?.checked || false;
+    currentState.alimony = parseFloat(document.getElementById('alimony-percent')?.value) || 0;
+    currentState.fitness = document.getElementById('fitness-deduction')?.checked || false;
+    
+    savePersistentState();
     const norm = parseFloat(document.getElementById('input-norm').value) || 1;
     const R = salary / norm;
     
@@ -610,15 +670,29 @@ function calculate() {
         localStorage.setItem('driver_rate', dRate);
     }
 
-    const totalGrossCalculated = code001 + code027 + code028 + code115 + code002 + shiftAllowance + medAdd + code116 + code290 + code030 + codeDriving + code010 + codeDiscretePay + code154;
+    // ГОДОВАЯ ПРЕМИЯ (В ЯНВАРЕ)
+    let annualBonus = 0;
+    if (currentState.selectedMonth === 0) { // Январь
+        annualBonus = currentState.annualBonus2025 || 0;
+    }
+
+    const otherGross = parseFloat(document.getElementById('input-other-gross').value) || 0;
+    const totalGrossCalculated = code001 + code027 + code028 + code115 + code002 + shiftAllowance + medAdd + code116 + code290 + code030 + codeDriving + code010 + codeDiscretePay + code154 + annualBonus + otherGross;
 
     
+    // НАЛОГИ И УДЕРЖАНИЯ (ПО РАСЧЕТНОМУ ЛИСТКУ)
     const opv = Math.round(totalGrossCalculated * 0.10);
     const vosms = Math.round(totalGrossCalculated * 0.02);
+    
+    // 440: Профсоюз (1% от базы: 001 + 002 + 115)
+    const unionToggle = document.getElementById('union-fee-toggle');
+    const unionFee = (unionToggle && unionToggle.checked) ? Math.round((code001 + code002 + code115) * 0.01) : 0;
+
     const taxableIncome = totalGrossCalculated - opv - vosms - CONFIG.TAX_DEDUCTION;
     const ipn = Math.max(0, Math.round(taxableIncome * 0.10));
     
-    const totalNetBeforeAlimony = totalGrossCalculated - opv - vosms - ipn - CONFIG.MED_DEDUCT;
+    // Итого Net до алиментов и фитнеса (учитывая все удержания из листка)
+    const totalNetBeforeExtras = totalGrossCalculated - opv - vosms - ipn - CONFIG.MED_DEDUCT - unionFee;
     
     // ФИТНЕС
     const fitnessCheckbox = document.getElementById('fitness-deduction');
@@ -626,9 +700,9 @@ function calculate() {
 
     // АЛИМЕНТЫ
     const alimonyPercent = parseFloat(document.getElementById('alimony-percent').value) || 0;
-    const alimonyAmount = Math.round(totalNetBeforeAlimony * (alimonyPercent / 100));
+    const alimonyAmount = Math.round(totalNetBeforeExtras * (alimonyPercent / 100));
     
-    const totalNet = totalNetBeforeAlimony - alimonyAmount - fitnessAmount;
+    const totalNet = totalNetBeforeExtras - alimonyAmount - fitnessAmount;
     
     const festiveNet = code116 * 0.78408;
     const salaryNet = totalNet - festiveNet;
@@ -650,8 +724,8 @@ function calculate() {
     const freeBalance = salaryNet - totalExpenses;
 
     updateDisplay({
-        totalGrossCalculated, totalNet, salaryNet, festiveNet, freeBalance, totalExpenses, opv, vosms, ipn, R, isCritical, expenseRatio, alimonyAmount, fitnessAmount,
-        code001, code027, code028, code115, code002, shiftAllowance, medAdd, code116, code290, code030, codeDriving, code010, codeDiscretePay, code154,
+        totalGrossCalculated, totalNet, salaryNet, festiveNet, freeBalance, totalExpenses, opv, vosms, ipn, unionFee, R, isCritical, expenseRatio, alimonyAmount, fitnessAmount,
+        code001, code027, code028, code115, code002, shiftAllowance, medAdd, code116, code290, code030, codeDriving, code010, codeDiscretePay, code154, annualBonus, otherGross,
         formulas: {
             f001: `${workHoursClean}ч × ${Math.round(R)}`,
             f027: `${holidayHours}ч × ${Math.round(R)}`,
@@ -665,12 +739,15 @@ function calculate() {
         }
     });
 
+    if (typeof calculateYearlyProjection === 'function') {
+        calculateYearlyProjection(); 
+    }
 }
 
 function updateDisplay(data) {
     animateValue('res-net', data.salaryNet);
     animateValue('res-gross', data.totalGrossCalculated);
-    animateValue('res-tax', data.opv + data.vosms + data.ipn);
+    animateValue('res-tax', data.opv + data.vosms + data.ipn + data.unionFee);
     animateValue('res-free-balance', data.freeBalance);
     animateValue('res-total-expenses', data.totalExpenses);
     
@@ -708,6 +785,8 @@ function updateDisplay(data) {
             ${data.code116 > 0 ? renderRow('Праздничная премия', data.code116, '116', 'МРП × 4325') : ''}
 
             ${data.code290 > 0 ? renderRow(t('row_med_exam'), data.code290, '290', data.formulas.f290) : ''}
+            ${data.otherGross > 0 ? renderRow('Прочие начисления', data.otherGross, 'Misc', 'Ручной ввод') : ''}
+            ${data.annualBonus > 0 ? renderRow('Годовая премия (2025)', data.annualBonus, '300', '17.5% от Базы 2025') : ''}
             ${renderRow(t('row_total_to_issue'), data.totalGrossCalculated, '399', '')}
         `;
     }
@@ -719,6 +798,7 @@ function updateDisplay(data) {
             ${renderRow(t('tax_vosms'), data.vosms, '425', 'Gross × 2%')}
             ${renderRow(t('tax_ipn'), data.ipn, '411', data.formulas.fIPN)}
             ${renderRow(t('tax_med_deduct'), CONFIG.MED_DEDUCT, '442', 'Fix')}
+            ${data.unionFee > 0 ? renderRow('Профсоюзные взносы (1%)', data.unionFee, '440', 'База × 1%') : ''}
             ${data.alimonyAmount > 0 ? renderRow(t('tax_alimony'), data.alimonyAmount, 'Deduct', `Net × ${document.getElementById('alimony-percent').value}%`) : ''}
             ${data.fitnessAmount > 0 ? renderRow(t('row_fitness'), data.fitnessAmount, 'Deduct', 'Fix') : ''}
         `;
@@ -727,37 +807,117 @@ function updateDisplay(data) {
     updateDonutChart(data.salaryNet, data.totalExpenses);
 }
 
-function updateDonutChart(net, expenses) {
-    const svgIncome = document.getElementById('donut-segment-income');
-    const svgExpenses = document.getElementById('donut-segment-expenses');
+const CATEGORY_COLORS = {
+    income: '#10b981',       // Green for remaining income
+    credits: '#f87171',    // Red
+    utilities: '#60a5fa',  // Blue
+    education: '#8b5cf6',  // Purple
+    shopping: '#fbbf24',   // Amber
+    entertainment: '#ec4899', // Pink
+    events: '#f97316',     // Orange
+    food: '#22c55e',        // Green
+    other: '#94a3b8'       // Slate
+};
+
+const CATEGORY_LABELS = {
+    credits: 'Кредиты',
+    utilities: 'Комуслуги',
+    education: 'Обучение',
+    shopping: 'Шопинг',
+    entertainment: 'Развлечения',
+    events: 'Мероприятия',
+    food: 'Продукты',
+    other: 'Прочее'
+};
+
+function updateDonutChart(net, totalExpenses) {
+    const container = document.getElementById('donut-segments-container');
+    const legend = document.querySelector('.legend');
     const pctText = document.getElementById('donut-pct');
     
-    if (!svgIncome || !svgExpenses || isNaN(net) || net <= 0) {
-        if (pctText) pctText.textContent = '0%';
-        return;
+    if (!container || !legend || isNaN(net) || net <= 0) return;
+
+    // 1. Фильтруем активные расходы за текущий месяц
+    const activeExpenses = currentState.expenses.filter(checkIsActive);
+    
+    // 2. Группируем по категориям
+    const categoryTotals = {};
+    activeExpenses.forEach(exp => {
+        const cat = exp.category || 'other';
+        categoryTotals[cat] = (categoryTotals[cat] || 0) + exp.amount;
+    });
+
+    const circumference = 2 * Math.PI * 85;
+    container.innerHTML = '';
+    legend.innerHTML = '';
+
+    let currentOffset = 0;
+
+    // 3. Сначала рисуем сегмент "Свободно" (Доход минус Расходы)
+    const freeAmount = Math.max(0, net - totalExpenses);
+    const freeRatio = freeAmount / net;
+    
+    if (freeRatio > 0) {
+        const dashArray = `${circumference * freeRatio} ${circumference}`;
+        const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        circle.setAttribute("cx", "100");
+        circle.setAttribute("cy", "100");
+        circle.setAttribute("r", "85");
+        circle.setAttribute("fill", "transparent");
+        circle.setAttribute("stroke", CATEGORY_COLORS.income);
+        circle.setAttribute("stroke-width", "15");
+        circle.style.strokeDasharray = dashArray;
+        circle.style.strokeDashoffset = -currentOffset;
+        circle.style.transform = "rotate(-90deg)";
+        circle.style.transformOrigin = "center";
+        circle.style.transition = "stroke-dashoffset 0.8s ease, stroke-dasharray 0.8s ease";
+        container.appendChild(circle);
+        
+        currentOffset += circumference * freeRatio;
+        
+        // Добавляем в легенду
+        legend.innerHTML += `
+            <div class="legend-item">
+                <div class="dot" style="background: ${CATEGORY_COLORS.income}"></div>
+                <span>Свободно</span>
+            </div>
+        `;
     }
 
-    const circumference = 2 * Math.PI * 85; // ~534.07
-    
-    // Расходы как доля от чистой ЗП
-    const expenseRatio = Math.min(expenses / net, 1);
-    const freeRatio = Math.max(0, 1 - expenseRatio);
+    // 4. Рисуем сегменты расходов по категориям
+    Object.keys(categoryTotals).forEach(cat => {
+        const amount = categoryTotals[cat];
+        const ratio = amount / net;
+        if (ratio <= 0) return;
 
-    // Устанавливаем базу (dasharray)
-    svgIncome.style.strokeDasharray = `${circumference} ${circumference}`;
-    svgExpenses.style.strokeDasharray = `${circumference} ${circumference}`;
+        const dashArray = `${circumference * ratio} ${circumference}`;
+        const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        circle.setAttribute("cx", "100");
+        circle.setAttribute("cy", "100");
+        circle.setAttribute("r", "85");
+        circle.setAttribute("fill", "transparent");
+        circle.setAttribute("stroke", CATEGORY_COLORS[cat] || CATEGORY_COLORS.other);
+        circle.setAttribute("stroke-width", "15");
+        circle.style.strokeDasharray = dashArray;
+        circle.style.strokeDashoffset = -currentOffset;
+        circle.style.transform = "rotate(-90deg)";
+        circle.style.transformOrigin = "center";
+        circle.style.transition = "stroke-dashoffset 0.8s ease, stroke-dasharray 0.8s ease";
+        container.appendChild(circle);
+        
+        currentOffset += circumference * ratio;
 
-    // Доход (Зеленый) всегда полный круг
-    svgIncome.style.strokeDashoffset = 0;
-    
-    // Расходы (Красный) — сектор поверх зеленого
-    // Если расходов 0, offset = circumference (круг не виден)
-    // Если расходы = ЗП, offset = 0 (круг полностью перекрыт красным)
-    const expensesOffset = circumference * (1 - expenseRatio);
-    svgExpenses.style.strokeDashoffset = expensesOffset;
+        // Добавляем в легенду
+        legend.innerHTML += `
+            <div class="legend-item">
+                <div class="dot" style="background: ${CATEGORY_COLORS[cat] || CATEGORY_COLORS.other}"></div>
+                <span>${CATEGORY_LABELS[cat] || cat}</span>
+            </div>
+        `;
+    });
 
-    // Процент свободных денег в центре
-    const freePct = Math.round(freeRatio * 100);
+    // 5. Обновляем процент свободных денег
+    const freePct = Math.round((freeAmount / net) * 100);
     if (pctText) {
         const currentPct = parseInt(pctText.textContent) || 0;
         gsap.to({ val: currentPct }, {
@@ -792,14 +952,233 @@ function switchTab(tabId, btn) {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     btn.classList.add('active');
     
-    const tabs = ['calc', 'details', 'expenses', 'graphs'];
+    const tabs = ['dashboard', 'calc', 'details', 'expenses', 'graphs'];
     tabs.forEach(t => {
         const el = document.getElementById(`tab-${t}`);
         if (el) el.style.display = (t === tabId) ? 'block' : 'none';
     });
     
+    if (tabId === 'dashboard') {
+        calculateYearlyProjection();
+        updateDashboardBonus();
+    }
     if (tabId === 'expenses') renderExpenses();
     if (tabId === 'graphs') renderScheduleEditor();
+}
+
+function updateDashboardBonus() {
+    const salary2026 = parseFloat(document.getElementById('base-salary').value) || 0;
+    
+    // Считаем дни отпуска из дат
+    const vStart = document.getElementById('vacation-start').value;
+    const vEnd = document.getElementById('vacation-end').value;
+    let vacationDays = 0;
+    
+    if (vStart && vEnd) {
+        const start = new Date(vStart);
+        const end = new Date(vEnd);
+        if (!isNaN(start) && !isNaN(end) && end >= start) {
+            // Разница в мс / (1000 * 60 * 60 * 24) + 1 (чтобы включить последний день)
+            vacationDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
+        }
+    }
+    
+    // Получаем данные за Январь (индекс 0) без премии
+    const janFull = calculateSpecificMonthNet(0, salary2026, true);
+    
+    // Целевая сумма на руки в Январе (с премией)
+    const targetJanNet = 2268533.75;
+    
+    // ПРОВЕРЕННАЯ ФОРМУЛА GROSS FROM NET (Учитывая потолки РК)
+    const OPV_CAP = 50 * CONFIG.MRP_2026;
+    const MIN_SALARY = 85000; 
+    const VOSMS_CAP = 10 * MIN_SALARY * 0.02;
+    const TAX_DEDUCT = CONFIG.TAX_DEDUCTION; 
+    
+    // Формула для дохода выше потолков ОПВ/ВОСМС:
+    // Net = Gross - OPV_CAP - VOSMS_CAP - IPN - MedDeduct - UnionFee
+    // IPN = (Gross - OPV_CAP - VOSMS_CAP - TAX_DEDUCT) * 0.1
+    // UnionFee = Gross * 0.01
+    // => Gross = (Net + 0.9 * (OPV_CAP + VOSMS_CAP) - 0.1 * TAX_DEDUCT + CONFIG.MED_DEDUCT) / 0.89
+    const targetJanGross = (targetJanNet + 0.9 * (OPV_CAP + VOSMS_CAP) - 0.1 * TAX_DEDUCT + CONFIG.MED_DEDUCT) / 0.89;
+    const bonusGross = Math.max(0, targetJanGross - janFull.gross);
+    
+    currentState.annualBonus2025 = bonusGross;
+    
+    const bonusEl = document.getElementById('dash-annual-bonus');
+    const baseEl = document.getElementById('dash-bonus-base');
+    
+    if (bonusEl) bonusEl.textContent = formatCurrency(currentState.annualBonus2025);
+    
+    if (baseEl) {
+        // Оценка оклада 2025: Оклад 2026 - (Оклад 2026 * Инфляция)
+        const OFFICIAL_INFLATION = 12.3;
+        const estSalary2025 = salary2026 * (1 - OFFICIAL_INFLATION / 100); 
+        
+        // Учет отпуска: база уменьшается пропорционально отработанным дням
+        const workDaysRatio = (365 - vacationDays) / 365;
+        const yearBase2025 = estSalary2025 * 12 * workDaysRatio;
+        
+        const calculatedPercent = (yearBase2025 > 0) ? (bonusGross / yearBase2025) * 100 : 0;
+        baseEl.textContent = `База 2025: ${formatCurrency(yearBase2025)} (Оклад: ${formatCurrency(estSalary2025)})`;
+        
+        // Обновляем заголовок карточки на дашборде
+        const dashTitleEl = document.querySelector('.dash-card.bonus .dash-label');
+        if (dashTitleEl) dashTitleEl.textContent = `Годовая премия (${calculatedPercent.toFixed(2)}%)`;
+        
+        // Обновляем текст в деталях начисления (код 300) в списке
+        const items = document.querySelectorAll('.payout-item');
+        items.forEach(item => {
+            const codeEl = item.querySelector('.item-code');
+            if (codeEl && codeEl.textContent.trim() === '300') {
+                const detailsEl = item.querySelector('.item-details');
+                if (detailsEl) detailsEl.textContent = `${calculatedPercent.toFixed(2)}% от Базы 2025`;
+            }
+        });
+    }
+}
+
+function calculateSpecificMonthNet(monthIdx, salary, returnFull = false) {
+    const schedule = getActiveScheduleData();
+    if (!schedule) return 0;
+    const monthData = schedule.data[monthIdx];
+    const shiftData = monthData[currentState.selectedShift] || monthData['A'];
+    
+    const R = salary / monthData.norm;
+    const workHoursClean = Math.max(0, (shiftData.w || 0) - (shiftData.h || 0));
+    const c001 = workHoursClean * R;
+    const c027 = (shiftData.h || 0) * R;
+    const c028 = (shiftData.h || 0) * R * 0.5;
+    const c010 = (shiftData.n || 0) * (R / 2);
+    const c115 = (c001 + c027 + c010) * CONFIG.BONUS_PERCENT;
+    const shiftAllowance = ((shiftData.w || 0) / 11) * CONFIG.SHIFT_ALLOWANCE;
+    const c116 = (HOLIDAY_BONUSES[monthIdx] || 0) * CONFIG.MRP_2026;
+    
+    // Доп. коды, которые могут быть включены
+    const hasJoint = document.getElementById('joint-role')?.checked || false;
+    const c030 = hasJoint ? ((shiftData.w || 0) * R * 0.30) : 0;
+    
+    const medExam = !!currentState.medExamByMonth[monthIdx];
+    const c290 = medExam ? (c001 * CONFIG.MEDICAL_EXAM_RATE) : 0;
+    
+    const driving = document.getElementById('driving-allowance')?.checked || false;
+    let cDriving = 0;
+    if (driving) {
+        const dRate = parseFloat(document.getElementById('driver-rate')?.value) || 0;
+        cDriving = (CONFIG.DRIVER_SALARY_4 / monthData.norm) * (shiftData.w || 0) * (dRate / 100);
+    }
+
+    const gross = c001 + c027 + c028 + c115 + shiftAllowance + CONFIG.MED_ADD + c116 + c010 + c030 + c290 + cDriving;
+    
+    // Union Fee check
+    let hasUnion = true;
+    for (let i = 0; i <= monthIdx; i++) {
+        if (currentState.unionFeeByMonth[i] !== undefined) hasUnion = currentState.unionFeeByMonth[i];
+    }
+    const unionFee = hasUnion ? (gross * 0.01) : 0;
+
+    const opv = Math.round(gross * 0.10);
+    const vosms = Math.round(gross * 0.02);
+    const taxable = gross - opv - vosms - CONFIG.TAX_DEDUCTION;
+    const ipn = Math.max(0, Math.round(taxable * 0.10));
+    const net = gross - opv - vosms - ipn - CONFIG.MED_DEDUCT - unionFee;
+
+    if (returnFull) {
+        return { gross, net, opv, vosms, ipn };
+    }
+    return net;
+}
+
+function saveExpenses() { localStorage.setItem('shiftcalc_expenses', JSON.stringify(currentState.expenses)); }
+function loadExpenses() {
+    const saved = localStorage.getItem('shiftcalc_expenses');
+    if (saved) { currentState.expenses = JSON.parse(saved); renderExpenses(); }
+}
+
+function calculateYearlyProjection() {
+    const salary = parseFloat(document.getElementById('base-salary').value) || 0;
+    const schedule = getActiveScheduleData();
+    if (!schedule) return;
+
+    let totalYearNet = 0;
+    let monthlyData = [];
+
+    // Проверка: был ли медосмотр хоть в одном месяце?
+    const hasAnyMedExam = Object.values(currentState.medExamByMonth).some(v => v === true);
+    let medExamAdded = false;
+
+    for (let m = 0; m < 12; m++) {
+        // Рассчитываем месяц через общую функцию (без медосмотра внутри, чтобы не дублировать)
+        // Для этого временно подменим статус медосмотра для этого месяца в currentState
+        const originalMedStatus = currentState.medExamByMonth[m];
+        currentState.medExamByMonth[m] = false; 
+        
+        let monthResult = calculateSpecificMonthNet(m, salary, true);
+        
+        // Возвращаем статус назад
+        currentState.medExamByMonth[m] = originalMedStatus;
+
+        let monthNet = monthResult.net;
+
+        // Если это январь, добавляем годовую премию
+        if (m === 0) {
+            // Рассчитываем налог на премию (упрощенно или через Gross)
+            // Но премия у нас уже в Gross, поэтому добавим её к январскому Gross и пересчитаем Net для января
+            const janGrossWithBonus = monthResult.gross + (currentState.annualBonus2025 || 0);
+            
+            // Налоги для января с учетом бонуса
+            const opv = Math.min(janGrossWithBonus * 0.10, 50 * CONFIG.MRP_2026);
+            const vosms = Math.min(janGrossWithBonus * 0.02, 10 * 85000 * 0.02);
+            const taxable = janGrossWithBonus - opv - vosms - CONFIG.TAX_DEDUCTION;
+            const ipn = Math.max(0, Math.round(taxable * 0.10));
+            
+            // Проверка профсоюза для января
+            let hasUnion = true;
+            if (currentState.unionFeeByMonth[0] !== undefined) hasUnion = currentState.unionFeeByMonth[0];
+            const unionFee = hasUnion ? (janGrossWithBonus * 0.01) : 0;
+
+            monthNet = janGrossWithBonus - opv - vosms - ipn - CONFIG.MED_DEDUCT - unionFee;
+        }
+
+        // Если в этом месяце отмечен медосмотр И мы его еще не добавляли в годовой итог
+        if (originalMedStatus && !medExamAdded) {
+            // Считаем "чистый" доход от медосмотра
+            const medGross = (salary / schedule.data[m].norm) * (schedule.data[m][currentState.selectedShift] || schedule.data[m]['A']).w * CONFIG.MEDICAL_EXAM_RATE;
+            const medNet = medGross * 0.89; // Приблизительный чистый доход (минус налоги)
+            monthNet += medNet;
+            medExamAdded = true;
+        }
+
+        totalYearNet += monthNet;
+        monthlyData.push(monthNet);
+    }
+
+    // Расходы за год
+    const totalYearExpenses = currentState.expenses.reduce((sum, exp) => {
+        if (exp.type === 'regular') return sum + (exp.amount * 12);
+        if (exp.type === 'credit') return sum + (exp.amount * Math.min(exp.term, 12));
+        if (exp.type === 'once') return sum + exp.amount;
+        return sum;
+    }, 0);
+
+    // Обновляем UI Дашборда
+    animateValue('dash-year-net', totalYearNet);
+    animateValue('dash-year-exp', totalYearExpenses);
+    animateValue('dash-year-free', totalYearNet - totalYearExpenses);
+
+    // Отрисовка мини-графика
+    const chartContainer = document.getElementById('yearly-mini-chart');
+    if (chartContainer) {
+        const maxNet = Math.max(...monthlyData, 1);
+        chartContainer.innerHTML = monthlyData.map((val, i) => `
+            <div class="chart-bar" 
+                 style="height: ${(val / maxNet) * 100}%" 
+                 data-value="${Math.round(val/1000)}k"></div>
+        `).join('');
+    }
+    
+    // Автосохранение
+    savePersistentState();
 }
 
 function formatCurrency(val) { 
@@ -819,19 +1198,25 @@ function addExpense() {
     const amount = parseFloat(document.getElementById('exp-amount').value);
     const type = document.getElementById('exp-type').value;
     const term = parseInt(document.getElementById('exp-term').value) || 0;
-    const priority = document.getElementById('exp-priority').value;
 
     if (!name || isNaN(amount)) return;
 
-    const newExpense = { 
-        id: Date.now(), 
-        name, 
-        amount, 
-        type, 
-        term, 
-        priority, // 'mandatory', 'optional'
-        startMonth: currentState.selectedMonth, 
-        isReducible: priority === 'optional' // для обратной совместимости
+    const category = document.getElementById('exp-category').value;
+    
+    // Авто-приоритет: Кредиты, услуги, обучение, еда - обязательны. Остальное - нет.
+    const mandatoryCategories = ['credits', 'utilities', 'education', 'food'];
+    const priority = mandatoryCategories.includes(category) ? 'mandatory' : 'optional';
+
+    const newExpense = {
+        id: Date.now(),
+        name,
+        amount,
+        category,
+        type,
+        priority,
+        startMonth: currentState.selectedMonth,
+        term: (type === 'credit') ? term : 1,
+        isReducible: priority === 'optional'
     };
 
     currentState.expenses.push(newExpense);
@@ -892,22 +1277,26 @@ function renderExpenses() {
             html += `<div class="expense-group-header">${group.title}</div>`;
             group.items.forEach(exp => {
                 const isActive = checkIsActive(exp);
-                // Показываем разовые только если они для текущего месяца
-                if (exp.type === 'once' && !isActive) return;
+                if (!isActive) return;
 
                 html += `
-                    <div class="expense-item ${exp.priority === 'optional' ? 'reducible' : ''} ${!isActive ? 'inactive' : ''} gsap-reveal">
+                    <div class="expense-item ${exp.priority === 'optional' ? 'reducible' : ''} gsap-reveal">
                         <div class="expense-info">
                             <div style="display:flex; align-items:center; gap:8px">
                                 <span class="expense-name">${exp.name}</span>
                                 <span class="priority-badge ${exp.priority === 'mandatory' ? 'priority-mandatory' : 'priority-optional'}">
                                     ${exp.priority === 'mandatory' ? 'Обязательный' : 'Дополнительный'}
                                 </span>
-                                ${!isActive ? '<span class="type-badge">Завершен/Ожидает</span>' : ''}
                             </div>
                             <div class="expense-meta">
                                 <span class="type-badge">${key === 'credit' ? 'Кредит' : key === 'regular' ? 'Ежемесячный' : 'Разовый'}</span>
-                                ${exp.type === 'credit' ? `<span class="expense-term">Срок: ${exp.term} мес.</span>` : ''}
+                                ${exp.type === 'credit' ? `
+                                    <span class="expense-term" style="color: var(--accent-blue)">
+                                        Осталось: ${exp.term - (currentState.selectedMonth - exp.startMonth)} мес. 
+                                        / ОД: ${formatCurrency(exp.amount * (exp.term - (currentState.selectedMonth - exp.startMonth)))}
+                                    </span>
+                                ` : ''}
+                                ${exp.type === 'regular' ? '<span class="expense-term">Активен всегда</span>' : ''}
                             </div>
                         </div>
                         <div style="display:flex; align-items:center; gap:15px">
@@ -934,6 +1323,7 @@ function checkIsActive(exp) {
     if (exp.type === 'once') return exp.startMonth === currentState.selectedMonth;
     if (exp.type === 'credit') {
         const monthsPassed = currentState.selectedMonth - exp.startMonth;
+        // Кредит активен, если мы в месяце начала или позже, но не дольше срока
         return monthsPassed >= 0 && monthsPassed < exp.term;
     }
     return true;
