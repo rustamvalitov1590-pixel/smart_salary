@@ -194,7 +194,16 @@ const TRANSLATIONS = {
         formula_days: "Дни",
         formula_road_calc: "ЧасыВПути × Ставка",
         formula_course_hours: "КурсЧасы",
-        formula_trips: "Выезды"
+        formula_trips: "Выезды",
+        achievement_badge: "★ ACHIEVEMENT",
+        footer_mrp: "МРП 2026",
+        footer_deduction: "Вычет",
+        footer_shift: "Вахта",
+        footer_day: "день",
+        footer_code: "Код",
+        schedule_prefix: "График",
+        schedule_day: "дневной",
+        schedule_night_day: "день+ночь"
     },
     kk: {
         app_title: "Smart Salary",
@@ -352,7 +361,16 @@ const TRANSLATIONS = {
         formula_days: "Күндер",
         formula_road_calc: "ЖолСағаттары × Ставка",
         formula_course_hours: "КурсСағаттары",
-        formula_trips: "Шығулар"
+        formula_trips: "Шығулар",
+        achievement_badge: "★ ЖЕТІСТІК",
+        footer_mrp: "АЕК 2026",
+        footer_deduction: "Шегерім",
+        footer_shift: "Вахта",
+        footer_day: "күн",
+        footer_code: "Код",
+        schedule_prefix: "Кесте",
+        schedule_day: "күндізгі",
+        schedule_night_day: "күн+түн"
     }
 };
 
@@ -402,7 +420,9 @@ function changeLanguage(lang) {
     
     // Re-render components that have hardcoded strings
     renderMonthDropdown();
+    renderScheduleDropdown();
     renderShiftSelector();
+    updateDashboardBonus();
     calculate();
 }
 
@@ -432,6 +452,33 @@ function renderMonthDropdown() {
     });
 }
 
+function translateScheduleName(name) {
+    if (currentState.lang === 'ru') return name;
+    
+    let translated = name;
+    translated = translated.replace('График', t('schedule_prefix'));
+    translated = translated.replace('дневной', t('schedule_day'));
+    translated = translated.replace('день+ночь', t('schedule_night_day'));
+    return translated;
+}
+
+function renderScheduleDropdown() {
+    const select = document.getElementById('schedule-select');
+    const editorSelect = document.getElementById('editor-schedule-select');
+    if (!select || !editorSelect) return;
+    
+    const currentVal = select.value;
+    const schedules = Object.keys(SCHEDULES_2026);
+    
+    const optionsHtml = schedules.map(s => {
+        const translated = translateScheduleName(s);
+        return `<option value="${s}" ${s === currentVal ? 'selected' : ''}>${translated}</option>`;
+    }).join('');
+    
+    select.innerHTML = optionsHtml;
+    editorSelect.innerHTML = optionsHtml;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     document.body.classList.add('loading');
     
@@ -444,6 +491,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initApp();
     updateUIStrings();
     renderMonthDropdown();
+    renderScheduleDropdown();
     updateView();
     calculateYearlyProjection(); // Первичный расчет года
     updateDashboardBonus(); // Расчет годовой премии 2025
@@ -499,33 +547,32 @@ function hidePreloader() {
     const preloader = document.getElementById('preloader');
     if (!preloader) return;
 
-    gsap.to(preloader, {
-        opacity: 0,
-        duration: 0.8,
-        delay: 0.2,
-        ease: "power2.inOut",
-        onComplete: () => {
-            preloader.style.display = 'none';
-            document.body.classList.remove('loading');
+    preloader.classList.add('fade-out');
+    
+    setTimeout(() => {
+        preloader.style.display = 'none';
+        document.body.classList.remove('loading');
+        
+        // Auto-reveal workspace
+        const workspace = document.getElementById('workspace');
+        if (workspace) {
+            workspace.style.display = 'block';
+            workspace.style.opacity = '1';
             
-            // Auto-reveal workspace
-            const workspace = document.getElementById('workspace');
-            if (workspace) {
-                workspace.style.display = 'block';
-                workspace.style.opacity = '1';
-                
+            requestAnimationFrame(() => {
                 gsap.from(".gsap-reveal", {
                     y: 20,
                     opacity: 0,
                     duration: 0.8,
                     stagger: 0.05,
-                    ease: "power2.out"
+                    ease: "power2.out",
+                    clearProps: "all"
                 });
-                
-                calculate();
-            }
+            });
+            
+            calculate();
         }
-    });
+    }, 800);
 
     gsap.to(".preloader-content", {
         scale: 1.05,
@@ -535,39 +582,7 @@ function hidePreloader() {
     });
 }
 
-function startApp() {
-    const hero = document.getElementById('hero-screen');
-    const workspace = document.getElementById('workspace');
-
-    // Transition Hero out
-    gsap.to(hero, {
-        y: -100,
-        opacity: 0,
-        duration: 0.8,
-        ease: "power3.inOut",
-        onComplete: () => {
-            hero.style.display = 'none';
-            
-            // Show Workspace
-            workspace.style.display = 'block';
-            gsap.to(workspace, {
-                opacity: 1,
-                duration: 1,
-                ease: "power2.out"
-            });
-
-            // Reveal workspace contents
-            // Восстанавливаем оклад и график
-            document.getElementById('input-salary').value = currentState.salary2026;
-            document.getElementById('schedule-select').value = currentState.selectedGraph;
-            document.getElementById('shift-select').value = currentState.selectedShift;
-            document.getElementById('month').value = currentState.selectedMonth;
-
-            updateView();
-            gsap.from(".gsap-reveal", { opacity: 0, y: 20, duration: 0.8, stagger: 0.1 });
-        }
-    });
-}
+// startApp function removed as it was unused and referenced non-existent elements
 
 function onScheduleChange() {
     currentState.selectedGraph = document.getElementById('schedule-select').value;
@@ -712,7 +727,13 @@ function handleMedExamToggle() {
     calculate();
 }
 
+let calcTimeout;
 function calculate() {
+    clearTimeout(calcTimeout);
+    calcTimeout = setTimeout(_calculate, 50);
+}
+
+function _calculate() {
     // 1. Собираем данные из UI
     const salary = parseFloat(document.getElementById('base-salary').value) || 0;
     currentState.salary = salary;
@@ -1297,12 +1318,26 @@ function formatCurrency(val) {
     return val.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ₸'; 
 }
 
+const animationTargets = {};
+
 function animateValue(id, value) {
     const el = document.getElementById(id);
     if (!el) return;
-    const startValue = parseFloat(el.textContent.replace(/[^\d.,]/g, '').replace(',', '.')) || 0;
-    const obj = { val: startValue };
-    gsap.to(obj, { val: value, duration: 1, ease: "power2.out", onUpdate: () => { el.textContent = formatCurrency(obj.val); } });
+    
+    if (!animationTargets[id]) {
+        const currentText = el.textContent.replace(/[^\d.,]/g, '').replace(',', '.');
+        animationTargets[id] = { val: parseFloat(currentText) || 0 };
+    }
+    
+    gsap.to(animationTargets[id], {
+        val: value,
+        duration: 0.8,
+        overwrite: true,
+        ease: "power2.out",
+        onUpdate: () => {
+            el.textContent = formatCurrency(animationTargets[id].val);
+        }
+    });
 }
 
 function addExpense() {
