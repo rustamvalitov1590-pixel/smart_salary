@@ -492,10 +492,11 @@ input:focus, select:focus {
 
 .legend {
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
-    gap: 24px;
-    width: 100%;
-    margin-top: 10px;
+    gap: 12px 20px;
+    margin-top: 25px;
+    padding: 0 10px;
 }
 
 .legend-item {
@@ -503,8 +504,8 @@ input:focus, select:focus {
     align-items: center;
     gap: 8px;
     font-size: 13px;
-    font-weight: 600;
     color: var(--text-muted);
+    white-space: nowrap;
 }
 
 .dot {
@@ -978,4 +979,176 @@ input:focus, select:focus {
     color: white;
     border-color: var(--accent-emerald);
     box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
+}
+
+/* Dashboard */
+.dashboard-grid {
+    display: grid;
+    gap: 16px;
+}
+
+.dash-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    box-shadow: var(--shadow-premium);
+    position: relative;
+    overflow: hidden;
+    transition: var(--transition-fast);
+}
+
+.dash-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.06);
+}
+
+.dash-card.main {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    color: #fff;
+    border: none;
+}
+
+.dash-label {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    opacity: 0.6;
+    margin-bottom: 8px;
+}
+
+.dash-card.main .dash-label {
+    color: var(--accent-emerald);
+    opacity: 1;
+}
+
+.dash-value {
+    font-family: 'Outfit', sans-serif;
+    font-size: 32px;
+    font-weight: 800;
+    margin-bottom: 4px;
+}
+
+.dash-value.small {
+    font-size: 24px;
+}
+
+.dash-sub {
+    font-size: 12px;
+    opacity: 0.5;
+}
+
+.dash-trend {
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.dash-trend.up { color: var(--accent-emerald); }
+.dash-trend.down { color: #f87171; }
+
+.chart-mini {
+    height: 180px;
+    display: flex;
+    flex-direction: column;
+}
+
+.mini-chart-container {
+    flex: 1;
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    padding: 10px 0;
+}
+
+.chart-bar {
+    flex: 1;
+    background: var(--accent-emerald);
+    border-radius: 4px 4px 0 0;
+    min-height: 4px;
+    transition: height 1s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+
+.chart-bar:hover::after {
+    content: attr(data-value);
+    position: absolute;
+    top: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #0f172a;
+    color: #fff;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 9px;
+    white-space: nowrap;
+}
+
+.mini-chart-months {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: var(--text-muted);
+    padding-top: 8px;
+    border-top: 1px solid var(--border-soft);
+}
+
+.quick-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.action-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 20px;
+    background: #f8fafc;
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+.action-btn:hover {
+    background: #fff;
+    border-color: var(--accent-emerald);
+    transform: scale(1.02);
+}
+
+.action-icon {
+    font-size: 24px;
+}
+
+.action-btn span {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.dash-card.bonus {
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+    border: 1px solid rgba(255, 215, 0, 0.3);
+}
+
+.bonus-badge {
+    position: absolute;
+    top: 15px;
+    right: -25px;
+    background: #ffd700;
+    color: #000;
+    font-size: 8px;
+    font-weight: 900;
+    padding: 4px 30px;
+    transform: rotate(45deg);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+
+.dash-card.bonus .dash-value {
+    color: #ffd700;
 }
