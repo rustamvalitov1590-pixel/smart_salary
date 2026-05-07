@@ -47,13 +47,54 @@
         </header>
 
         <nav class="tabs gsap-reveal">
-            <button class="tab active" onclick="switchTab('calc', this)" data-i18n="tab_calc">Калькулятор</button>
+            <button class="tab active" onclick="switchTab('dashboard', this)" data-i18n="tab_dashboard">Обзор</button>
+            <button class="tab" onclick="switchTab('calc', this)" data-i18n="tab_calc">Калькулятор</button>
             <button class="tab" onclick="switchTab('details', this)" data-i18n="tab_details">Детализация</button>
             <button class="tab" onclick="switchTab('expenses', this)" data-i18n="tab_expenses">Расходы</button>
             <button class="tab" onclick="switchTab('graphs', this)" data-i18n="tab_graphs">Графики</button>
         </nav>
 
-        <div id="tab-calc">
+        <div id="tab-dashboard" style="display: block;">
+            <section class="dashboard-grid gsap-reveal" style="margin-top: 20px;">
+                    <div class="dash-card main">
+                        <div class="dash-label">Прогноз дохода (2026)</div>
+                        <div class="dash-value" id="dash-year-net">0 ₸</div>
+                        <div class="dash-sub">Чистая прибыль за 12 месяцев</div>
+                    </div>
+                    
+                    <div class="dash-card bonus">
+                        <div class="dash-label" style="color: #ffd700;">Годовая премия (17.5%)</div>
+                        <div class="dash-value small" id="dash-annual-bonus">0 ₸</div>
+                        <div class="dash-sub" id="dash-bonus-base">База 2025: расчет...</div>
+                        <div class="bonus-badge">★ ACHIEVEMENT</div>
+                    </div>
+                
+                <div class="grid-2">
+                    <div class="dash-card">
+                        <div class="dash-label">Расходы (Год)</div>
+                        <div class="dash-value small" id="dash-year-exp">0 ₸</div>
+                        <div class="dash-trend down">Обязательства</div>
+                    </div>
+                    <div class="dash-card">
+                        <div class="dash-label">Свободно</div>
+                        <div class="dash-value small" id="dash-year-free">0 ₸</div>
+                        <div class="dash-trend up">Потенциал</div>
+                    </div>
+                </div>
+
+                <div class="dash-card chart-mini">
+                    <div class="dash-label">Динамика зарплаты</div>
+                    <div class="mini-chart-container" id="yearly-mini-chart">
+                        <!-- Bars will be injected here -->
+                    </div>
+                    <div class="mini-chart-months">
+                        <span>Янв</span><span>Июн</span><span>Дек</span>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div id="tab-calc" style="display: none;">
             <header class="welcome-section gsap-reveal">
                 <div class="welcome-content">
                     <h2 data-i18n="welcome_title">Профессиональное планирование на 2026 год</h2>
@@ -85,8 +126,27 @@
                 <div id="shift-selector-container" class="toggle-group gsap-reveal">
                     <!-- Dynamic shift buttons injected here -->
                 </div>
+            </section>
 
+            <section class="config-card card gsap-reveal">
                 <div class="grid-2">
+                    <div class="field">
+                        <label data-i18n="label_salary">Оклад 2026 (Gross)</label>
+                        <input type="number" id="base-salary" placeholder="0" oninput="calculate()">
+                    </div>
+                    <div class="field" style="display: flex; gap: 10px;">
+                        <div style="flex: 1;">
+                            <label>Начало отпуска</label>
+                            <input type="date" id="vacation-start" onchange="calculate()" value="2025-08-24">
+                        </div>
+                        <div style="flex: 1;">
+                            <label>Конец отпуска</label>
+                            <input type="date" id="vacation-end" onchange="calculate()" value="2025-09-22">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid-2" style="margin-top: 15px;">
                     <div class="field">
                         <label data-i18n="label_month">Месяц 2026</label>
                         <select id="month" onchange="updateView()">
@@ -105,13 +165,6 @@
                         </select>
                     </div>
                     <div class="field">
-                        <label data-i18n="label_salary">Оклад (₸)</label>
-                        <input type="number" id="base-salary" data-i18n-placeholder="placeholder_salary" placeholder="Введите оклад" oninput="calculate()">
-                    </div>
-                </div>
-
-                <div class="grid-2">
-                    <div class="field">
                         <label data-i18n="label_alimony">Алименты (удержание)</label>
                         <select id="alimony-percent" onchange="calculate()">
                             <option value="0" data-i18n="alimony_none">Нет</option>
@@ -122,7 +175,7 @@
                     </div>
                 </div>
 
-                <div class="additional-options gsap-reveal">
+                <div class="additional-options" style="margin-top: 20px;">
                     <label class="checkbox-container">
                         <input type="checkbox" id="joint-role" onchange="calculate()">
                         <div class="checkbox-label">
@@ -149,11 +202,8 @@
                         </div>
                     </div>
 
-
-
-
                     <label class="checkbox-container">
-                        <input type="checkbox" id="med-exam-allowance" onchange="calculate()">
+                        <input type="checkbox" id="med-exam-allowance" onchange="handleMedExamToggle()">
                         <div class="checkbox-label">
                             <span class="main-label" data-i18n="label_med_exam">Медосмотр (Пункт 290)</span>
                             <span class="sub-label" data-i18n="sub_med_exam">Начисляется один раз в год в выбранном месяце</span>
@@ -165,14 +215,6 @@
                         <div class="checkbox-label">
                             <span class="main-label" data-i18n="label_night_discrete">Ночные (дискретный режим)</span>
                             <span class="sub-label" data-i18n="sub_night_discrete">Специальный расчет ночных смен</span>
-                        </div>
-                    </label>
-
-                    <label class="checkbox-container">
-                        <input type="checkbox" id="fitness-deduction" onchange="calculate()">
-                        <div class="checkbox-label">
-                            <span class="main-label" data-i18n="label_fitness">Фитнес абонемент</span>
-                            <span class="sub-label" data-i18n="sub_fitness">Фиксированное удержание (22 263 ₸)</span>
                         </div>
                     </label>
 
@@ -192,12 +234,31 @@
                         </div>
                     </div>
 
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="union-fee-toggle" checked onchange="handleUnionToggle()">
+                        <div class="checkbox-label">
+                            <span class="main-label">Профсоюзный взнос (1%)</span>
+                            <span class="sub-label">Удержание 1% от основных начислений</span>
+                        </div>
+                    </label>
+
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="fitness-deduction" onchange="calculate()">
+                        <div class="checkbox-label">
+                            <span class="main-label" data-i18n="label_fitness">Фитнес абонемент</span>
+                            <span class="sub-label" data-i18n="sub_fitness">Фиксированное удержание (22 263 ₸)</span>
+                        </div>
+                    </label>
                 </div>
             </section>
 
             <section class="card gsap-reveal" id="working-hours-card">
                 <div class="card-title" data-i18n="card_tabel">Данные табеля</div>
                 <div class="grid-2">
+                    <div class="field">
+                        <label>Прочие начисления (Gross)</label>
+                        <input type="number" id="input-other-gross" placeholder="0" oninput="calculate()">
+                    </div>
                     <div class="field">
                         <label data-i18n="label_norm">Норма (ч)</label>
                         <input type="number" id="input-norm" oninput="calculate()">
@@ -278,8 +339,9 @@
                 <div class="donut-container">
                     <svg class="donut-svg" width="200" height="200" viewBox="0 0 200 200">
                         <circle class="donut-ring" cx="100" cy="100" r="85"></circle>
-                        <circle id="donut-segment-income" class="donut-income" cx="100" cy="100" r="85"></circle>
-                        <circle id="donut-segment-expenses" class="donut-expenses" cx="100" cy="100" r="85"></circle>
+                        <g id="donut-segments-container">
+                            <!-- Category segments will be injected here -->
+                        </g>
                     </svg>
                     <div class="donut-text">
                         <span id="donut-pct" class="donut-percent">0%</span>
@@ -298,11 +360,27 @@
                 </div>
             </section>
 
-            <section class="add-expense-form gsap-reveal">
+            <section class="add-expense-form card gsap-reveal">
                 <div class="card-title" data-i18n="tab_expenses_title">Добавить расход / кредит</div>
-                <div class="field">
-                    <label data-i18n="label_exp_name">Название</label>
-                    <input type="text" id="exp-name" data-i18n-placeholder="placeholder_exp" placeholder="Напр. Кредит на авто">
+                
+                <div class="grid-2">
+                    <div class="field">
+                        <label data-i18n="label_exp_name">Название</label>
+                        <input type="text" id="exp-name" data-i18n-placeholder="placeholder_exp" placeholder="Напр. Кредит на авто">
+                    </div>
+                    <div class="field">
+                        <label>Категория</label>
+                        <select id="exp-category">
+                            <option value="credits">Кредиты</option>
+                            <option value="utilities">Комуслуги</option>
+                            <option value="education">Обучение детей</option>
+                            <option value="shopping">Шопинг</option>
+                            <option value="entertainment">Развлечения</option>
+                            <option value="events">Мероприятия</option>
+                            <option value="food">Продукты питания</option>
+                            <option value="other" selected>Прочее</option>
+                        </select>
+                    </div>
                 </div>
                 
                 <div class="grid-2" style="margin-top:15px">
@@ -325,14 +403,7 @@
                     <input type="number" id="exp-term" placeholder="Напр. 12">
                 </div>
 
-                <div class="field" style="margin-top: 15px;">
-                    <label data-i18n="label_exp_priority">Важность расхода</label>
-                    <select id="exp-priority">
-                        <option value="mandatory" data-i18n="exp_pri_high">Обязательный (Кредиты, аренда, налоги)</option>
-                        <option value="optional" data-i18n="exp_pri_low">Необязательный (Подписки, развлечения, кафе)</option>
-                    </select>
-                </div>
-                <button class="btn-add" onclick="addExpense()" data-i18n="btn_add_exp">+ Добавить в список</button>
+                <button class="btn-add" onclick="addExpense()" data-i18n="btn_add_exp" style="margin-top: 20px;">+ Добавить в список</button>
             </section>
 
             <section class="card">
