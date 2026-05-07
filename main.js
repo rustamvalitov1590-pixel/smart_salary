@@ -138,7 +138,63 @@ const TRANSLATIONS = {
         row_fitness: "Фитнес абонемент",
         label_med_exam: "Медосмотр (Пункт 290)",
         sub_med_exam: "Начисляется один раз в год в выбранном месяце",
-        preloader_subtitle: "Финансовые расчеты высокой точности"
+        preloader_subtitle: "Финансовые расчеты высокой точности",
+        dash_projection: "Прогноз дохода (2026)",
+        dash_net_12: "Чистая прибыль за 12 месяцев",
+        label_expenses_annual: "Расходы (Год)",
+        label_free_annual: "Свободно",
+        dash_liabilities: "Обязательства",
+        dash_potential: "Потенциал",
+        dash_chart_title: "Динамика зарплаты",
+        month_short_jan: "Янв",
+        month_short_jun: "Июн",
+        month_short_dec: "Дек",
+        label_vac_start: "Начало отпуска",
+        label_vac_end: "Конец отпуска",
+        label_union: "Профсоюзный взнос (1%)",
+        sub_union: "Удержание 1% от основных начислений",
+        label_other_gross: "Прочие начисления (Gross)",
+        legend_income: "Доход",
+        legend_expenses: "Расходы",
+        label_category: "Категория",
+        cat_credits: "Кредиты",
+        cat_utilities: "Комуслуги",
+        cat_education: "Обучение",
+        cat_shopping: "Шопинг",
+        cat_entertainment: "Развлечения",
+        cat_events: "Мероприятия",
+        cat_food: "Продукты",
+        cat_other: "Прочее",
+        row_bonus_base_hint: "от Базы 2025",
+        exp_empty: "Список пока пуст...",
+        exp_group_credit: "💳 Кредиты и займы",
+        exp_group_reg: "🔄 Регулярные расходы",
+        exp_group_once: "📅 В этом месяце (Разовые)",
+        exp_pri_mandatory: "Обязательный",
+        exp_pri_optional: "Дополнительный",
+        exp_type_credit_label: "Кредит",
+        exp_type_reg_label: "Ежемесячный",
+        exp_type_once_label: "Разовый",
+        exp_remains: "Осталось",
+        exp_month_unit: "мес.",
+        exp_active_always: "Активен всегда",
+        savings_critical_title: "🚨 Критическая нагрузка",
+        savings_critical_desc: "Ваши расходы превысили 85% дохода, но у вас нет необязательных трат для сокращения. Рекомендуется пересмотреть бюджет.",
+        savings_warning_title: "Внимание: Перерасход!",
+        savings_warning_desc: "Ваши расходы составляют {ratio}% от дохода. Рекомендуем сократить {count} доп. трат. Это позволит освободить {amount}.",
+        ed_shift_params: "Параметры смены",
+        ed_hours_total: "Часы (всего)",
+        ed_night: "Ночные",
+        ed_holiday: "Праздничные часы",
+        ed_road: "Часы в пути",
+        ed_vac_days: "Отпуск (дни)",
+        formula_manual: "Ручной ввод",
+        formula_fix: "Фикс",
+        formula_base: "База",
+        formula_days: "Дни",
+        formula_road_calc: "ЧасыВПути × Ставка",
+        formula_course_hours: "КурсЧасы",
+        formula_trips: "Выезды"
     },
     kk: {
         app_title: "Smart Salary",
@@ -240,7 +296,63 @@ const TRANSLATIONS = {
         row_fitness: "Фитнес абонементі",
         label_med_exam: "Медициналық тексеру (290-тармақ)",
         sub_med_exam: "Таңдалған айда жылына бір рет есептеледі",
-        preloader_subtitle: "Жоғары дәлдіктегі қаржылық есептеулер"
+        preloader_subtitle: "Жоғары дәлдіктегі қаржылық есептеулер",
+        dash_projection: "Табыс болжамы (2026)",
+        dash_net_12: "12 айдағы таза пайда",
+        label_expenses_annual: "Шығындар (Жыл)",
+        label_free_annual: "Бос",
+        dash_liabilities: "Міндеттемелер",
+        dash_potential: "Әлеует",
+        dash_chart_title: "Жалақы динамикасы",
+        month_short_jan: "Қаң",
+        month_short_jun: "Мау",
+        month_short_dec: "Жел",
+        label_vac_start: "Демалыс басы",
+        label_vac_end: "Демалыс соңы",
+        label_union: "Кәсіподақ жарнасы (1%)",
+        sub_union: "Негізгі есептеулерден 1% ұстап қалу",
+        label_other_gross: "Басқа есептеулер (Gross)",
+        legend_income: "Табыс",
+        legend_expenses: "Шығындар",
+        label_category: "Санат",
+        cat_credits: "Кредиттер",
+        cat_utilities: "Комқызметтер",
+        cat_education: "Оқу",
+        cat_shopping: "Шопинг",
+        cat_entertainment: "Ойын-сауық",
+        cat_events: "Іс-шаралар",
+        cat_food: "Азық-түлік",
+        cat_other: "Басқа",
+        row_bonus_base_hint: "2025 Базасынан",
+        exp_empty: "Тізім бос...",
+        exp_group_credit: "💳 Кредиттер мен қарыздар",
+        exp_group_reg: "🔄 Тұрақты шығындар",
+        exp_group_once: "📅 Осы айда (Бір реттік)",
+        exp_pri_mandatory: "Міндетті",
+        exp_pri_optional: "Қосымша",
+        exp_type_credit_label: "Кредит",
+        exp_type_reg_label: "Ай сайын",
+        exp_type_once_label: "Бір реттік",
+        exp_remains: "Қалды",
+        exp_month_unit: "ай",
+        exp_active_always: "Әрқашан белсенді",
+        savings_critical_title: "🚨 Критикалық жүктеме",
+        savings_critical_desc: "Шығындарыңыз табыстың 85%-ынан асты, бірақ қысқартуға болатын міндетті емес шығындар жоқ. Бюджетті қайта қарау ұсынылады.",
+        savings_warning_title: "Назар аударыңыз: Артық шығын!",
+        savings_warning_desc: "Шығындарыңыз табыстың {ratio}% құрайды. {count} қосымша шығынды қысқартуды ұсынамыз. Бұл {amount} босатуға мүмкіндік береді.",
+        ed_shift_params: "Ауысым параметрлері",
+        ed_hours_total: "Сағаттар (барлығы)",
+        ed_night: "Түнгі",
+        ed_holiday: "Мерекелік сағаттар",
+        ed_road: "Жолдағы сағаттар",
+        ed_vac_days: "Демалыс (күндер)",
+        formula_manual: "Қолмен енгізу",
+        formula_fix: "Фикс",
+        formula_base: "База",
+        formula_days: "Күндер",
+        formula_road_calc: "ЖолСағаттары × Ставка",
+        formula_course_hours: "КурсСағаттары",
+        formula_trips: "Шығулар"
     }
 };
 
@@ -770,23 +882,23 @@ function updateDisplay(data) {
     const detailedGross = document.getElementById('detailed-gross');
     if (detailedGross) {
         detailedGross.innerHTML = `
-            ${renderRow('Основная ЗП', data.code001, '001', data.formulas.f001)}
-            ${renderRow('Праздничные (База)', data.code027, '027', data.formulas.f027)}
-            ${data.code028 > 0 ? renderRow('Праздничные (Доплата)', data.code028, '028', data.formulas.f028) : ''}
-            ${renderRow('Премия (25%)', data.code115, '115', data.formulas.f115)}
-            ${renderRow('Время в пути', data.code002, '002', ' ЧасыВПути × Ставка')}
-            ${renderRow('Надбавка за вахту', data.shiftAllowance, '062', 'Дни × 650')}
-            ${renderRow('Медстраховка (Начисл.)', data.medAdd, '293', 'Фикс')}
-            ${data.code030 > 0 ? renderRow('Совмещение (30%)', data.code030, '030', 'КурсЧасы × 30%') : ''}
-            ${data.codeDriving > 0 ? renderRow('Доплата за вождение', data.codeDriving, '031', data.formulas.fDriving) : ''}
-            ${data.code010 > 0 ? renderRow('Ночные 50%', data.code010, '010', data.formulas.f010) : ''}
-            ${data.codeDiscretePay > 0 ? renderRow('Дискретность доплата', data.codeDiscretePay, '062', 'Выезды × 650') : ''}
+            ${renderRow(t('row_basic'), data.code001, '001', data.formulas.f001)}
+            ${renderRow(t('row_holiday_base'), data.code027, '027', data.formulas.f027)}
+            ${data.code028 > 0 ? renderRow(t('row_holiday_extra'), data.code028, '028', data.formulas.f028) : ''}
+            ${renderRow(t('row_bonus'), data.code115, '115', data.formulas.f115)}
+            ${renderRow(t('row_road'), data.code002, '002', t('formula_road_calc'))}
+            ${renderRow(t('row_shift'), data.shiftAllowance, '062', `${t('formula_days')} × 650`)}
+            ${renderRow(t('row_med_add'), data.medAdd, '293', t('formula_fix'))}
+            ${data.code030 > 0 ? renderRow(t('row_joint'), data.code030, '030', `${t('formula_course_hours')} × 30%`) : ''}
+            ${data.codeDriving > 0 ? renderRow(t('row_driving'), data.codeDriving, '031', data.formulas.fDriving) : ''}
+            ${data.code010 > 0 ? renderRow(t('row_night'), data.code010, '010', data.formulas.f010) : ''}
+            ${data.codeDiscretePay > 0 ? renderRow(t('row_discrete'), data.codeDiscretePay, '062', `${t('formula_trips')} × 650`) : ''}
             ${data.code154 > 0 ? renderRow(t('row_training'), data.code154, '154', data.formulas.f154) : ''}
-            ${data.code116 > 0 ? renderRow('Праздничная премия', data.code116, '116', 'МРП × 4325') : ''}
+            ${data.code116 > 0 ? renderRow(t('row_festive_bonus'), data.code116, '116', 'МРП × 4325') : ''}
 
             ${data.code290 > 0 ? renderRow(t('row_med_exam'), data.code290, '290', data.formulas.f290) : ''}
-            ${data.otherGross > 0 ? renderRow('Прочие начисления', data.otherGross, 'Misc', 'Ручной ввод') : ''}
-            ${data.annualBonus > 0 ? renderRow('Годовая премия (2025)', data.annualBonus, '300', '17.5% от Базы 2025') : ''}
+            ${data.otherGross > 0 ? renderRow(t('label_other_gross'), data.otherGross, 'Misc', t('formula_manual')) : ''}
+            ${data.annualBonus > 0 ? renderRow(`${t('summary_festive')} (2025)`, data.annualBonus, '300', `17.5% ${t('row_bonus_base_hint')}`) : ''}
             ${renderRow(t('row_total_to_issue'), data.totalGrossCalculated, '399', '')}
         `;
     }
@@ -797,10 +909,10 @@ function updateDisplay(data) {
             ${renderRow(t('tax_opv'), data.opv, '420', 'Gross × 10%')}
             ${renderRow(t('tax_vosms'), data.vosms, '425', 'Gross × 2%')}
             ${renderRow(t('tax_ipn'), data.ipn, '411', data.formulas.fIPN)}
-            ${renderRow(t('tax_med_deduct'), CONFIG.MED_DEDUCT, '442', 'Fix')}
-            ${data.unionFee > 0 ? renderRow('Профсоюзные взносы (1%)', data.unionFee, '440', 'База × 1%') : ''}
+            ${renderRow(t('tax_med_deduct'), CONFIG.MED_DEDUCT, '442', t('formula_fix'))}
+            ${data.unionFee > 0 ? renderRow(t('label_union'), data.unionFee, '440', `${t('formula_base')} × 1%`) : ''}
             ${data.alimonyAmount > 0 ? renderRow(t('tax_alimony'), data.alimonyAmount, 'Deduct', `Net × ${document.getElementById('alimony-percent').value}%`) : ''}
-            ${data.fitnessAmount > 0 ? renderRow(t('row_fitness'), data.fitnessAmount, 'Deduct', 'Fix') : ''}
+            ${data.fitnessAmount > 0 ? renderRow(t('row_fitness'), data.fitnessAmount, 'Deduct', t('formula_fix')) : ''}
         `;
     }
 
@@ -820,14 +932,14 @@ const CATEGORY_COLORS = {
 };
 
 const CATEGORY_LABELS = {
-    credits: 'Кредиты',
-    utilities: 'Комуслуги',
-    education: 'Обучение',
-    shopping: 'Шопинг',
-    entertainment: 'Развлечения',
-    events: 'Мероприятия',
-    food: 'Продукты',
-    other: 'Прочее'
+    credits: 'cat_credits',
+    utilities: 'cat_utilities',
+    education: 'cat_education',
+    shopping: 'cat_shopping',
+    entertainment: 'cat_entertainment',
+    events: 'cat_events',
+    food: 'cat_food',
+    other: 'cat_other'
 };
 
 function updateDonutChart(net, totalExpenses) {
@@ -879,7 +991,7 @@ function updateDonutChart(net, totalExpenses) {
         legend.innerHTML += `
             <div class="legend-item">
                 <div class="dot" style="background: ${CATEGORY_COLORS.income}"></div>
-                <span>Свободно</span>
+                <span>${t('free_pct_label')}</span>
             </div>
         `;
     }
@@ -911,7 +1023,7 @@ function updateDonutChart(net, totalExpenses) {
         legend.innerHTML += `
             <div class="legend-item">
                 <div class="dot" style="background: ${CATEGORY_COLORS[cat] || CATEGORY_COLORS.other}"></div>
-                <span>${CATEGORY_LABELS[cat] || cat}</span>
+                <span>${t(CATEGORY_LABELS[cat]) || cat}</span>
             </div>
         `;
     });
@@ -1020,11 +1132,11 @@ function updateDashboardBonus() {
         const yearBase2025 = estSalary2025 * 12 * workDaysRatio;
         
         const calculatedPercent = (yearBase2025 > 0) ? (bonusGross / yearBase2025) * 100 : 0;
-        baseEl.textContent = `База 2025: ${formatCurrency(yearBase2025)} (Оклад: ${formatCurrency(estSalary2025)})`;
+        baseEl.textContent = `${t('row_bonus_base_hint')}: ${formatCurrency(yearBase2025)} (${t('label_salary')}: ${formatCurrency(estSalary2025)})`;
         
         // Обновляем заголовок карточки на дашборде
         const dashTitleEl = document.querySelector('.dash-card.bonus .dash-label');
-        if (dashTitleEl) dashTitleEl.textContent = `Годовая премия (${calculatedPercent.toFixed(2)}%)`;
+        if (dashTitleEl) dashTitleEl.textContent = `${t('summary_festive')} (${calculatedPercent.toFixed(2)}%)`;
         
         // Обновляем текст в деталях начисления (код 300) в списке
         const items = document.querySelectorAll('.payout-item');
@@ -1032,7 +1144,7 @@ function updateDashboardBonus() {
             const codeEl = item.querySelector('.item-code');
             if (codeEl && codeEl.textContent.trim() === '300') {
                 const detailsEl = item.querySelector('.item-details');
-                if (detailsEl) detailsEl.textContent = `${calculatedPercent.toFixed(2)}% от Базы 2025`;
+                if (detailsEl) detailsEl.textContent = `${calculatedPercent.toFixed(2)}% ${t('row_bonus_base_hint')}`;
             }
         });
     }
@@ -1256,15 +1368,15 @@ function renderExpenses() {
     if (!list) return;
     
     if (currentState.expenses.length === 0) {
-        list.innerHTML = '<div style="text-align:center; opacity:0.5; padding:20px">Список пока пуст...</div>';
+        list.innerHTML = `<div style="text-align:center; opacity:0.5; padding:20px">${t('exp_empty')}</div>`;
         renderSavingsAnalysis([]);
         return;
     }
 
     const groups = {
-        credit: { title: '💳 Кредиты и займы', items: [] },
-        regular: { title: '🔄 Регулярные расходы', items: [] },
-        once: { title: '📅 В этом месяце (Разовые)', items: [] }
+        credit: { title: t('exp_group_credit'), items: [] },
+        regular: { title: t('exp_group_reg'), items: [] },
+        once: { title: t('exp_group_once'), items: [] }
     };
 
     currentState.expenses.forEach(exp => {
@@ -1285,21 +1397,21 @@ function renderExpenses() {
                             <div style="display:flex; align-items:center; gap:8px">
                                 <span class="expense-name">${exp.name}</span>
                                 <span class="priority-badge ${exp.priority === 'mandatory' ? 'priority-mandatory' : 'priority-optional'}">
-                                    ${exp.priority === 'mandatory' ? 'Обязательный' : 'Дополнительный'}
+                                    ${exp.priority === 'mandatory' ? t('exp_pri_mandatory') : t('exp_pri_optional')}
                                 </span>
                             </div>
                             <div class="expense-meta">
-                                <span class="type-badge">${key === 'credit' ? 'Кредит' : key === 'regular' ? 'Ежемесячный' : 'Разовый'}</span>
+                                <span class="type-badge">${key === 'credit' ? t('exp_type_credit_label') : key === 'regular' ? t('exp_type_reg_label') : t('exp_type_once_label')}</span>
                                 ${exp.type === 'credit' ? `
                                     <span class="expense-term" style="color: var(--accent-blue)">
-                                        Осталось: ${exp.term - (currentState.selectedMonth - exp.startMonth)} мес. 
+                                        ${t('exp_remains')}: ${exp.term - (currentState.selectedMonth - exp.startMonth)} ${t('exp_month_unit')} 
                                         / ОД: ${formatCurrency(exp.amount * (exp.term - (currentState.selectedMonth - exp.startMonth)))}
                                     </span>
                                 ` : ''}
-                                ${exp.type === 'regular' ? '<span class="expense-term">Активен всегда</span>' : ''}
+                                ${exp.type === 'regular' ? `<span class="expense-term">${t('exp_active_always')}</span>` : ''}
                             </div>
                         </div>
-                        <div style="display:flex; align-items:center; gap:15px">
+                        <div class="expense-actions">
                             <span class="expense-amount">${formatCurrency(exp.amount)}</span>
                             <button class="btn-delete" onclick="deleteExpense(${exp.id})">
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
@@ -1353,8 +1465,8 @@ function renderSavingsAnalysis(activeExpenses) {
         panel.style.display = 'block';
         panel.className = 'savings-card critical gsap-reveal';
         panel.innerHTML = `
-            <div class="savings-title">🚨 Критическая нагрузка</div>
-            <div class="savings-text">Ваши расходы превысили 85% дохода, но у вас нет необязательных трат для сокращения. Рекомендуется пересмотреть бюджет.</div>
+            <div class="savings-title">${t('savings_critical_title')}</div>
+            <div class="savings-text">${t('savings_critical_desc')}</div>
         `;
         return;
     }
@@ -1363,16 +1475,18 @@ function renderSavingsAnalysis(activeExpenses) {
     
     panel.style.display = 'block';
     panel.className = 'savings-card critical gsap-reveal';
+    
+    let desc = t('savings_warning_desc')
+        .replace('{ratio}', `<b>${Math.round(ratio * 100)}</b>`)
+        .replace('{count}', `<span class="savings-amount">${optionalExpenses.length}</span>`)
+        .replace('{amount}', `<span class="savings-amount">${formatCurrency(totalPotentialSavings)}</span>`);
+
     panel.innerHTML = `
         <div class="savings-title">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-            Внимание: Перерасход!
+            ${t('savings_warning_title')}
         </div>
-        <div class="savings-text">
-            Ваши расходы составляют <b>${Math.round(ratio * 100)}%</b> от дохода. 
-            Рекомендуем сократить <span class="savings-amount">${optionalExpenses.length} доп. трат</span>. 
-            Это позволит освободить <span class="savings-amount">${formatCurrency(totalPotentialSavings)}</span>.
-        </div>
+        <div class="savings-text">${desc}</div>
     `;
 }
 
@@ -1447,30 +1561,30 @@ function renderScheduleEditor() {
         const s = (monthData && monthData[shift]) ? monthData[shift] : { w: 0, n: 0, h: 0, r: 0, vd: 0 };
         html += `
             <div class="shift-editor-card gsap-reveal">
-                <div class="shift-title">Параметры смены ${shift}</div>
+                <div class="shift-title">${t('ed_shift_params')} ${shift}</div>
                 <div class="editor-row">
                     <div class="field">
-                        <label>Часы (всего)</label>
+                        <label>${t('ed_hours_total')}</label>
                         <input type="number" id="ed-${shift}-w" value="${s.w || 0}">
                     </div>
                     <div class="field">
-                        <label>Ночные</label>
+                        <label>${t('ed_night')}</label>
                         <input type="number" id="ed-${shift}-n" value="${s.n || 0}">
                     </div>
                 </div>
                 <div class="editor-row">
                     <div class="field">
-                        <label>Праздничные часы</label>
+                        <label>${t('ed_holiday')}</label>
                         <input type="number" id="ed-${shift}-h" value="${s.h || 0}">
                     </div>
                     <div class="field">
-                        <label>Часы в пути</label>
+                        <label>${t('ed_road')}</label>
                         <input type="number" id="ed-${shift}-r" value="${s.r || 0}">
                     </div>
                 </div>
                 <div class="editor-row">
                     <div class="field">
-                        <label>Отпуск (дни)</label>
+                        <label>${t('ed_vac_days')}</label>
                         <input type="number" id="ed-${shift}-vd" value="${s.vd || 0}">
                     </div>
                 </div>
