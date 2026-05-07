@@ -226,16 +226,14 @@ const TRANSLATIONS = {
 };
 
 let currentState = {
-    lang: 'ru', 
+    lang: 'ru', // Текущий язык
     selectedGraph: "График №3-1 (дневной)",
     selectedShift: 'A',
-    selectedMonth: 2, 
+    selectedMonth: 2, // Март
     salary: CONFIG.BASE_SALARY,
-    alimonyRate: 0,
     hasJointRole: false,
-    hasMedExam: false, 
     expenses: [],
-    userSchedules: {} 
+    userSchedules: {} // Хранилище правок пользователя
 };
 
 function t(key) {
@@ -246,6 +244,7 @@ function changeLanguage(lang) {
     currentState.lang = lang;
     localStorage.setItem('selected_lang', lang);
     
+    // Update Switcher UI
     document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
     const activeBtn = document.getElementById(`lang-ru`);
     const kkBtn = document.getElementById(`lang-kk`);
@@ -254,17 +253,20 @@ function changeLanguage(lang) {
 
     updateUIStrings();
     
+    // Re-render components that have hardcoded strings
     renderMonthDropdown();
     renderShiftSelector();
     calculate();
 }
 
 function updateUIStrings() {
+    // Basic elements
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
         el.innerText = t(key);
     });
 
+    // Placeholders
     document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
         const key = el.getAttribute('data-i18n-placeholder');
         el.placeholder = t(key);
@@ -286,6 +288,7 @@ function renderMonthDropdown() {
 document.addEventListener('DOMContentLoaded', () => {
     document.body.classList.add('loading');
     
+    // Restore language preference
     const savedLang = localStorage.getItem('selected_lang');
     if (savedLang) currentState.lang = savedLang;
 
@@ -302,8 +305,10 @@ function initApp() {
     document.getElementById('base-salary').value = currentState.salary;
     document.getElementById('schedule-select').value = currentState.selectedGraph;
     
+    // Initialize dynamic shifts
     renderShiftSelector();
 
+    // Start Premium Preloader Timeline
     const tl = gsap.timeline({
         onComplete: hidePreloader
     });
@@ -332,6 +337,7 @@ function initApp() {
         ease: "power2.inOut"
     }, "-=1");
 
+    // Load driving allowance settings
     const savedDRate = localStorage.getItem('driver_rate');
     if (savedDRate) document.getElementById('driver-rate').value = savedDRate;
 }
@@ -349,6 +355,7 @@ function hidePreloader() {
             preloader.style.display = 'none';
             document.body.classList.remove('loading');
             
+            // Auto-reveal workspace
             const workspace = document.getElementById('workspace');
             if (workspace) {
                 workspace.style.display = 'block';
@@ -379,6 +386,7 @@ function startApp() {
     const hero = document.getElementById('hero-screen');
     const workspace = document.getElementById('workspace');
 
+    // Transition Hero out
     gsap.to(hero, {
         y: -100,
         opacity: 0,
@@ -387,6 +395,7 @@ function startApp() {
         onComplete: () => {
             hero.style.display = 'none';
             
+            // Show Workspace
             workspace.style.display = 'block';
             gsap.to(workspace, {
                 opacity: 1,
@@ -394,6 +403,7 @@ function startApp() {
                 ease: "power2.out"
             });
 
+            // Reveal workspace contents
             gsap.from(".gsap-reveal", {
                 y: 20,
                 opacity: 0,
@@ -408,6 +418,7 @@ function startApp() {
 function onScheduleChange() {
     currentState.selectedGraph = document.getElementById('schedule-select').value;
     
+    // Auto-select valid shift if current one doesn't exist in new graph
     const graphData = getActiveScheduleData();
     const monthData = graphData ? graphData.data[currentState.selectedMonth] : null;
     if (monthData) {
@@ -469,16 +480,19 @@ function updateView() {
     document.getElementById('input-holiday').value = shiftData.h || 0;
     document.getElementById('input-road').value = shiftData.r || 8;
     
+    // Сброс разовых начислений при смене месяца/смены
     const trainingInput = document.getElementById('input-training');
     if (trainingInput) trainingInput.value = 0;
     
     const medExamCB = document.getElementById('med-exam-allowance');
-    if (medExamCB) medExamCB.checked = currentState.hasMedExam;
+    if (medExamCB) medExamCB.checked = false;
     
+    // Auto-populate night hours
     const nightHoursInput = document.getElementById('input-night');
     if (nightHoursInput) {
         nightHoursInput.value = shiftData.n || 0;
         
+        // Ensure Night logic is triggered if n > 0
         const nightCB = document.getElementById('discrete-night');
         const nightRow = document.getElementById('night-hours-row');
         if (shiftData.n > 0) {
@@ -494,9 +508,6 @@ function updateView() {
 }
 
 function toggleDrivingDetails() {
-    currentState.hasJointRole = document.getElementById('joint-role').checked;
-    currentState.hasMedExam = document.getElementById('med-exam-allowance').checked;
-    
     const cb = document.getElementById('driving-allowance');
     const details = document.getElementById('driving-details');
     if (!cb || !details) return;
@@ -789,7 +800,6 @@ function switchTab(tabId, btn) {
     
     if (tabId === 'expenses') renderExpenses();
     if (tabId === 'graphs') renderScheduleEditor();
-    if (tabId === 'yearly') renderYearlyReport();
 }
 
 function formatCurrency(val) { 
@@ -811,8 +821,6 @@ function addExpense() {
     const term = parseInt(document.getElementById('exp-term').value) || 0;
     const priority = document.getElementById('exp-priority').value;
 
-    const principal = parseFloat(document.getElementById('exp-principal').value) || 0;
-
     if (!name || isNaN(amount)) return;
 
     const newExpense = { 
@@ -821,10 +829,9 @@ function addExpense() {
         amount, 
         type, 
         term, 
-        principal, // Основной Долг
-        priority, 
+        priority, // 'mandatory', 'optional'
         startMonth: currentState.selectedMonth, 
-        isReducible: priority === 'optional'
+        isReducible: priority === 'optional' // для обратной совместимости
     };
 
     currentState.expenses.push(newExpense);
@@ -900,10 +907,7 @@ function renderExpenses() {
                             </div>
                             <div class="expense-meta">
                                 <span class="type-badge">${key === 'credit' ? 'Кредит' : key === 'regular' ? 'Ежемесячный' : 'Разовый'}</span>
-                                ${exp.type === 'credit' ? `
-                                    <span class="expense-term">Срок: ${exp.term} мес.</span>
-                                    <span class="expense-term">ОД: ${formatCurrency(exp.principal)}</span>
-                                ` : ''}
+                                ${exp.type === 'credit' ? `<span class="expense-term">Срок: ${exp.term} мес.</span>` : ''}
                             </div>
                         </div>
                         <div style="display:flex; align-items:center; gap:15px">
@@ -1140,102 +1144,4 @@ function saveExpenses() { localStorage.setItem('shiftcalc_expenses', JSON.string
 function loadExpenses() {
     const saved = localStorage.getItem('shiftcalc_expenses');
     if (saved) { currentState.expenses = JSON.parse(saved); renderExpenses(); }
-}
-
-function renderYearlyReport() {
-    const tbody = document.getElementById('yearly-report-body');
-    if (!tbody) return;
-
-    let totalYearNet = 0;
-    let totalYearExp = 0;
-    let html = '';
-
-    // Сохраняем текущий месяц, чтобы потом вернуть
-    const originalMonth = currentState.selectedMonth;
-
-    for (let m = 0; m < 12; m++) {
-        currentState.selectedMonth = m;
-        
-        // Временный расчет для каждого месяца
-        const results = runSilentCalculate(m);
-        
-        const activeExpenses = currentState.expenses.filter(exp => {
-            if (exp.type === 'regular') return true;
-            if (exp.type === 'once') return exp.startMonth === m;
-            if (exp.type === 'credit') {
-                const monthsPassed = m - exp.startMonth;
-                return monthsPassed >= 0 && monthsPassed < exp.term;
-            }
-            return false;
-        });
-
-        const monthExp = activeExpenses.reduce((sum, e) => sum + e.amount, 0);
-        const balance = results.net - monthExp;
-
-        totalYearNet += results.net;
-        totalYearExp += monthExp;
-
-        html += `
-            <tr>
-                <td>${TRANSLATIONS[currentState.language].months[m]}</td>
-                <td>${formatCurrency(results.net)}</td>
-                <td style="color:var(--danger)">${formatCurrency(monthExp)}</td>
-                <td style="font-weight:600; color:${balance >= 0 ? 'var(--primary)' : 'var(--danger)'}">${formatCurrency(balance)}</td>
-            </tr>
-        `;
-    }
-
-    tbody.innerHTML = html;
-    document.getElementById('year-total-net').textContent = formatCurrency(totalYearNet);
-    document.getElementById('year-total-exp').textContent = formatCurrency(totalYearExp);
-
-    // Возвращаем исходный месяц
-    currentState.selectedMonth = originalMonth;
-}
-
-// Функция для фонового расчета без обновления UI
-function runSilentCalculate(monthIdx) {
-    const fullData = getActiveScheduleData();
-    const monthData = fullData ? fullData.data[monthIdx] : null;
-    if (!monthData) return { net: 0, gross: 0 };
-
-    const shift = monthData[currentState.selectedShift] || { w: 0, n: 0, h: 0, r: 0 };
-    const norm = monthData.norm || 168;
-    const baseSalary = parseFloat(document.getElementById('base-salary').value) || 0;
-    const R = baseSalary / norm;
-
-    // Код 001
-    const code001 = shift.w * R;
-    
-    // Ночные (упрощенно для отчета, если не дискрет)
-    const code027 = shift.n * R * 0.5;
-    
-    // Праздничные
-    const code010 = shift.h * R * 0.5;
-    
-    // Экология
-    const code031 = CONFIG.ENV_PAYMENT;
-    
-    // Премия (115)
-    const bonusBase = code001 + code027 + code010;
-    const code115 = bonusBase * CONFIG.BONUS_PERCENT;
-
-    // Группа Б
-    const shiftDays = shift.w / 11;
-    const shiftAllowance = shiftDays * CONFIG.SHIFT_ALLOWANCE;
-    const medAdd = CONFIG.MED_ADD;
-    
-    // Совмещение
-    const code030 = currentState.hasJointRole ? (shift.w * R * 0.30) : 0;
-    
-    // Медосмотр (считаем только в Апреле (3) по умолчанию для годового отчета, если не выбрано иначе)
-    // Но для простоты в отчете считаем его там, где стоит галочка в текущем UI
-    const code290 = currentState.hasMedExam ? (code001 * CONFIG.MEDICAL_EXAM_RATE) : 0;
-
-    const gross = code001 + code027 + code010 + code031 + code115 + shiftAllowance + medAdd + code030 + code290;
-    
-    // Налоги (упрощенно 21% для быстрой оценки в отчете)
-    const net = gross * 0.79; 
-
-    return { net, gross };
 }
