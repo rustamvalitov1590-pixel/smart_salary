@@ -26,13 +26,22 @@
     -webkit-tap-highlight-color: transparent;
 }
 
-html, body {
-    margin: 0 !important;
-    padding: 0 !important;
-    width: 100% !important;
-    min-width: 100% !important;
+html {
     overflow-x: hidden;
-    -webkit-text-size-adjust: 100%;
+    height: -webkit-fill-available;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+    position: relative;
 }
 
 body {
@@ -700,6 +709,13 @@ input:focus, select:focus {
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    pointer-events: all;
+    transition: opacity 0.8s ease-in-out;
+}
+
+#preloader.fade-out {
+    pointer-events: none;
+    opacity: 0;
 }
 
 .preloader-mesh {
